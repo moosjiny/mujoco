@@ -1,0 +1,255 @@
+<?xml version="1.0" ?>
+<robot name="omx_f">
+  <link name="link0">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="/home/addinedu/ros2_ws/src/open_manipulator/open_manipulator_description/meshes/omx_f/follower_01_base.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="grey">
+        <color rgba="0.2 0.2 0.2 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="/home/addinedu/ros2_ws/src/open_manipulator/open_manipulator_description/meshes/omx_f/follower_01_base.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-1.441250800e-02 -3.149887900e-03 1.927659900e-02"/>
+      <mass value="2.238905100e-01"/>
+      <inertia ixx="0.000305886" ixy="1.38531e-05" ixz="5.39965e-05" iyy="0.000319524" iyz="1.35332e-05" izz="0.000306571"/>
+    </inertial>
+  </link>
+
+  <joint name="joint1" type="revolute">
+    <parent link="link0"/>
+    <child link="link1"/>
+    <origin rpy="0 0 0" xyz="0.01125 0.0 0.034"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="1000" lower="-3.141592653589793" upper="3.141592653589793" velocity="4.8"/>
+    <dynamics damping="0.05"/>
+  </joint>
+
+  <link name="link1">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="/home/addinedu/ros2_ws/src/open_manipulator/open_manipulator_description/meshes/omx_f/follower_02_base_tilt_Revised.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="/home/addinedu/ros2_ws/src/open_manipulator/open_manipulator_description/meshes/omx_f/follower_02_base_tilt_Revised.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-6.223620400e-06 6.049232300e-04 1.341880300e-02"/>
+      <mass value="6.598703800e-02"/>
+      <inertia ixx="2.15491e-05" ixy="3.30873e-08" ixz="-5.23439e-08" iyy="2.15431e-05" iyz="1.37893e-07" izz="1.16431e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="joint2" type="revolute">
+    <parent link="link1"/>
+    <child link="link2"/>
+    <origin rpy="0 0 0" xyz="0.0 0.0 0.0635"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-3.141592653589793" upper="3.141592653589793" velocity="4.8"/>
+    <dynamics damping="0.1"/>
+  </joint>
+
+  <link name="link2">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="/home/addinedu/ros2_ws/src/open_manipulator/open_manipulator_description/meshes/omx_f/follower_03_middle_verticle.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="/home/addinedu/ros2_ws/src/open_manipulator/open_manipulator_description/meshes/omx_f/follower_03_middle_verticle.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="2.933991700e-02 2.977875700e-04 1.131500000e-01"/>
+      <mass value="8.722146900e-02"/>
+      <inertia ixx="1.19639e-04" ixy="-1.17875e-06" ixz="-4.2494e-06" iyy="1.10903e-04" iyz="-5.2323e-08" izz="3.49911e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="joint3" type="revolute">
+    <parent link="link2"/>
+    <child link="link3"/>
+    <origin rpy="0 0 0" xyz="0.0415 0.0 0.11315"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-3.141592653589793" upper="3.141592653589793" velocity="4.8"/>
+    <dynamics damping="0.1"/>
+  </joint>
+
+  <link name="link3">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="/home/addinedu/ros2_ws/src/open_manipulator/open_manipulator_description/meshes/omx_f/follower_04_middle_horizontal.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="/home/addinedu/ros2_ws/src/open_manipulator/open_manipulator_description/meshes/omx_f/follower_04_middle_horizontal.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="5.714859800e-02 4.131006400e-04 -3.582921300e-03"/>
+      <mass value="8.375912900e-02"/>
+      <inertia ixx="1.53676e-05" ixy="2.39169e-06" ixz="1.06648e-06" iyy="0.000226024" iyz="4.81907e-08" izz="0.000230543"/>
+    </inertial>
+  </link>
+
+  <joint name="joint4" type="revolute">
+    <parent link="link3"/>
+    <child link="link4"/>
+    <origin rpy="0 0 0" xyz="0.162 0.0 0.0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="1000" lower="-3.141592653589793" upper="3.141592653589793" velocity="4.8"/>
+    <dynamics damping="0.1"/>
+  </joint>
+
+  <link name="link4">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="/home/addinedu/ros2_ws/src/open_manipulator/open_manipulator_description/meshes/omx_f/follower_05_tip.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="/home/addinedu/ros2_ws/src/open_manipulator/open_manipulator_description/meshes/omx_f/follower_05_tip.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="2.323498000e-02 6.773537500e-05 5.976131300e-03"/>
+      <mass value="2.997506200e-02"/>
+      <inertia ixx="4.72073e-06" ixy="-7.17066e-10" ixz="3.41405e-07" iyy="6.69023e-06" iyz="-1.68882e-10" izz="7.09954e-06"/>
+    </inertial>
+  </link>
+
+  <joint name="joint5" type="revolute">
+    <parent link="link4"/>
+    <child link="link5"/>
+    <origin rpy="0 0 0" xyz="0.0287 0.0 0.0"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="1000" lower="-3.141592653589793" upper="3.141592653589793" velocity="4.8"/>
+    <dynamics damping="0.1"/>
+  </joint>
+
+  <link name="link5">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="/home/addinedu/ros2_ws/src/open_manipulator/open_manipulator_description/meshes/omx_f/follower_06_pan_Revised.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="/home/addinedu/ros2_ws/src/open_manipulator/open_manipulator_description/meshes/omx_f/follower_06_pan_Revised.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="2.807240700e-02 2.413594100e-05 1.352891400e-02"/>
+      <mass value="4.381088500e-02"/>
+      <inertia ixx="1.37255e-05" ixy="4.12053e-08" ixz="-8.21731e-06" iyy="2.32357e-05" iyz="8.01252e-09" izz="1.7183e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="gripper_joint_1" type="revolute">
+    <parent link="link5"/>
+    <child link="link6"/>
+    <origin rpy="0 0 0" xyz="0.0295 0.0075 0.0"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="1000" lower="-3.141592653589793" upper="3.141592653589793" velocity="4.8"/>
+    <dynamics damping="0.1"/>
+  </joint>
+
+  <link name="link6">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="/home/addinedu/ros2_ws/src/open_manipulator/open_manipulator_description/meshes/omx_f/follower_07_gripper_motorized.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="/home/addinedu/ros2_ws/src/open_manipulator/open_manipulator_description/meshes/omx_f/follower_07_gripper_motorized.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="1.616456500e-02 1.273103200e-03 2.729160000e-04"/>
+      <mass value="1.209067700e-02"/>
+      <inertia ixx="4.78912e-06" ixy="1.0028e-06" ixz="-2.4283e-08" iyy="4.78483e-06" iyz="4.70884e-09" izz="6.87819e-06"/>
+    </inertial>
+  </link>
+
+  <joint name="gripper_joint_2" type="revolute">
+    <parent link="link5"/>
+    <child link="link7"/>
+    <origin rpy="0 0 0" xyz="0.0295 -0.0108 0.0"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="1000" lower="-3.141592653589793" upper="3.141592653589793" velocity="4.8"/>
+    <dynamics damping="0.1"/>
+    <mimic joint="gripper_joint_1" multiplier="-1" offset="0"/>
+  </joint>
+
+  <link name="link7">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="/home/addinedu/ros2_ws/src/open_manipulator/open_manipulator_description/meshes/omx_f/follower_08_gripper_gear.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="grey"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="/home/addinedu/ros2_ws/src/open_manipulator/open_manipulator_description/meshes/omx_f/follower_08_gripper_gear.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="1.616456500e-02 1.273103200e-03 2.729160000e-04"/>
+      <mass value="1.209067700e-02"/>
+      <inertia ixx="4.78912e-06" ixy="1.0028e-06" ixz="-2.4283e-08" iyy="4.78483e-06" iyz="4.70884e-09" izz="6.87819e-06"/>
+    </inertial>
+  </link>
+
+  <link name="end_effector_link">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+      <material name="red">
+        <color rgba="1.0 0.0 0.0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="end_effector_joint" type="fixed">
+    <parent link="link5"/>
+    <child link="end_effector_link"/>
+    <origin rpy="0 0 0" xyz="0.09193 -0.0016 0"/>
+  </joint>
+
+</robot>

@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+
+# Build / install (ROS / colcon)
+build/
+install/
+log/
+
+# Captures (large images & GIFs from offscreen render)
+captures/
+
+# MuJoCo logs
+MUJOCO_LOG.TXT
+
+# Backups
+*.bak
+*.pre_*.bak
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

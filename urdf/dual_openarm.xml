@@ -1,0 +1,240 @@
+<mujoco model="wowrobo_openarm_bimanual">
+  <compiler angle="radian"/>
+
+  <option timestep="0.001" integrator="implicitfast"/>
+
+  <visual>
+    <global offwidth="1920" offheight="1080"/>
+    <headlight ambient="0.4 0.4 0.4" diffuse="0.6 0.6 0.6" specular="0.2 0.2 0.2"/>
+  </visual>
+
+  <asset>
+    <texture type="skybox" colorspace="auto" builtin="gradient" rgb1="0.55 0.7 0.85" rgb2="0.1 0.15 0.25" width="512" height="3072"/>
+    <texture type="2d" colorspace="auto" name="groundplane" builtin="checker" mark="edge" rgb1="0.25 0.3 0.35" rgb2="0.18 0.22 0.27" markrgb="0.7 0.7 0.7" width="512" height="512"/>
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="6 6" reflectance="0.15"/>
+    <mesh name="link1" file="/home/moos/dev_ws/dual_arms/meshes/link1.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="link2" file="/home/moos/dev_ws/dual_arms/meshes/link2.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="link3" file="/home/moos/dev_ws/dual_arms/meshes/link3.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="link4" file="/home/moos/dev_ws/dual_arms/meshes/link4.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="link5" file="/home/moos/dev_ws/dual_arms/meshes/link5.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="link6" file="/home/moos/dev_ws/dual_arms/meshes/link6.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="link7" file="/home/moos/dev_ws/dual_arms/meshes/link7.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="link11" content_type="model/stl" file="/home/moos/dev_ws/dual_arms/meshes/link1.stl" scale="-0.001 0.001 0.001"/>
+    <mesh name="link21" content_type="model/stl" file="/home/moos/dev_ws/dual_arms/meshes/link2.stl" scale="-0.001 0.001 0.001"/>
+    <mesh name="link31" content_type="model/stl" file="/home/moos/dev_ws/dual_arms/meshes/link3.stl" scale="-0.001 0.001 0.001"/>
+    <mesh name="omxf_link0_mesh" file="/opt/ros/jazzy/share/open_manipulator_description/meshes/omx_f/follower_01_base.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="omxf_link1_mesh" file="/opt/ros/jazzy/share/open_manipulator_description/meshes/omx_f/follower_02_base_tilt_Revised.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="omxf_link2_mesh" file="/opt/ros/jazzy/share/open_manipulator_description/meshes/omx_f/follower_03_middle_verticle.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="omxf_link3_mesh" file="/opt/ros/jazzy/share/open_manipulator_description/meshes/omx_f/follower_04_middle_horizontal.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="omxf_link4_mesh" file="/opt/ros/jazzy/share/open_manipulator_description/meshes/omx_f/follower_05_tip.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="omxf_link5_mesh" file="/opt/ros/jazzy/share/open_manipulator_description/meshes/omx_f/follower_06_pan_Revised.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="omxf_link6_mesh" file="/opt/ros/jazzy/share/open_manipulator_description/meshes/omx_f/follower_07_gripper_motorized.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="omxf_link7_mesh" file="/opt/ros/jazzy/share/open_manipulator_description/meshes/omx_f/follower_08_gripper_gear.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="vicpinky_lidar_mesh" file="/home/moos/dev_ws/dual_arms/meshes/vicpinky/lidar.stl"/>
+  </asset>
+
+  <worldbody>
+    <geom name="floor" size="0 0 0.05" pos="0 0.5 -0.05" type="plane" material="groundplane"/>
+    <light name="sun" pos="2 -2 5" dir="-0.276172 0.276172 -0.920575" type="directional" diffuse="0.7 0.7 0.65" specular="0.2 0.2 0.2"/>
+    <body name="base_plate">
+      <geom size="0.2 0.2 0.01" pos="0 0 0.01" type="box" group="1" density="0" rgba="0.7 0.7 0.7 1"/>
+      <body name="central_pillar" pos="0 0 0.02">
+        <inertial pos="0 0 0" mass="10" diaginertia="0.1 0.1 0.1"/>
+        <geom size="0.04 0.06 0.4" pos="0 0 0.4" type="box" group="1" density="0" rgba="0.7 0.7 0.7 1"/>
+        <body name="shoulder_block">
+          <inertial pos="0 0 0" mass="5" diaginertia="0.05 0.05 0.05"/>
+          <geom size="0.075 0.175 0.09" type="box" group="1" density="0" rgba="0.7 0.7 0.7 1"/>
+          <body name="left_base_link" pos="0 0.0175 0.753" quat="0.707105 0.707108 0 0">
+            <inertial pos="0 0 0" mass="1" diaginertia="0.01 0.01 0.01"/>
+            <body name="left_link1" pos="0 0 0.0625">
+              <inertial pos="0 0 0" mass="0.5" diaginertia="0.01 0.01 0.01"/>
+              <joint name="left_joint_1" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-10 10" damping="0.25" frictionloss="0.02"/>
+              <geom pos="0 0 -0.0625" type="mesh" group="1" density="0" mesh="link1"/>
+              <body name="left_link2" pos="-0.0301 0 0.06">
+                <inertial pos="0 0 0" mass="0.5" diaginertia="0.01 0.01 0.01"/>
+                <joint name="left_joint_2" pos="0 0 0" axis="-1 0 0" range="-1.57 1.57" actuatorfrcrange="-12 12" damping="0.25" frictionloss="0.02"/>
+                <geom pos="0.0301 0 -0.1225" quat="1 0 0 0" type="mesh" group="1" density="0" mesh="link2"/>
+                <body name="left_link3" pos="0.0301 0 0.06625">
+                  <inertial pos="0 0 0" mass="0.4" diaginertia="0.01 0.01 0.01"/>
+                  <joint name="left_joint_3" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-10 10" damping="0.25" frictionloss="0.02"/>
+                  <geom pos="0 0 -0.18875" quat="1 0 0 0" type="mesh" group="1" density="0" mesh="link3"/>
+                  <body name="left_link4" pos="0 0.0315 0.15375">
+                    <inertial pos="0 0 0" mass="0.4" diaginertia="0.01 0.01 0.01"/>
+                    <joint name="left_joint_4" pos="0 0 0" axis="0 1 0" range="-1.57 1.57" actuatorfrcrange="-10 10" damping="0.25" frictionloss="0.02"/>
+                    <geom pos="0 -0.0315 -0.3425" type="mesh" group="1" density="0" mesh="link4"/>
+                    <body name="left_link5" pos="0 -0.0315 0.0955">
+                      <inertial pos="0 0 0" mass="0.3" diaginertia="0.005 0.005 0.005"/>
+                      <joint name="left_joint_5" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-10 10" damping="0.25" frictionloss="0.02"/>
+                      <geom pos="0 0 -0.438" quat="1 0 0 0" type="mesh" group="1" density="0" mesh="link5"/>
+                      <body name="left_link6" pos="0.0375 0 0.1205">
+                        <inertial pos="0 0 0" mass="0.2" diaginertia="0.005 0.005 0.005"/>
+                        <joint name="left_joint_6" pos="0 0 0" axis="1 0 0" range="-1.57 1.57" actuatorfrcrange="-10 10" damping="0.25" frictionloss="0.02"/>
+                        <geom pos="-0.0375 0 -0.5585" quat="1 0 0 0" type="mesh" group="1" density="0" mesh="link6"/>
+                        <body name="left_link7" pos="-0.0375 0 0">
+                          <inertial pos="0 0 0" mass="0.1" diaginertia="0.002 0.002 0.002"/>
+                          <joint name="left_joint_7" pos="0 0 0" axis="0 1 0" range="-3.14 3.14" actuatorfrcrange="-10 10" damping="0.25" frictionloss="0.02"/>
+                          <geom pos="0 0 -0.5585" type="mesh" group="1" density="0" mesh="link7"/>
+                          <body name="left_finger_1" pos="0 0.0075 0.0989">
+                            <inertial pos="0 0 0" mass="0.01" diaginertia="1e-05 1e-05 1e-05"/>
+                            <joint name="left_finger_joint1" pos="0 0 0" axis="0 1 0" type="slide" range="0 0.044" actuatorfrcrange="-0.1 0.1" damping="0.25" frictionloss="0.02"/>
+                            <geom size="0.005 0.004 0.02" pos="0 0 0.02" type="box" group="1" density="0" rgba="0.4 0.4 0.4 1"/>
+                          </body>
+                          <body name="left_finger_2" pos="0 -0.0045 0.0989">
+                            <inertial pos="0 0 0" mass="0.01" diaginertia="1e-05 1e-05 1e-05"/>
+                            <joint name="left_finger_joint2" pos="0 0 0" axis="0 -1 0" type="slide" range="0 0.044" actuatorfrcrange="-0.1 0.1" damping="0.25" frictionloss="0.02"/>
+                            <geom size="0.005 0.004 0.02" pos="0 0 0.02" type="box" group="1" density="0" rgba="0.4 0.4 0.4 1"/>
+                          </body>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+          <body name="right_base_link" pos="0 -0.0175 0.753" quat="0.707105 -0.707108 0 0">
+            <inertial pos="0 0 0" mass="1" diaginertia="0.01 0.01 0.01"/>
+            <body name="right_link1" pos="0 0 0.0625">
+              <inertial pos="0 0 0" mass="0.5" diaginertia="0.01 0.01 0.01"/>
+              <joint name="right_joint_1" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-10 10" damping="0.25" frictionloss="0.02"/>
+              <geom pos="0 0 -0.0625" type="mesh" group="1" density="0" mesh="link11"/>
+              <body name="right_link2" pos="0.0301 0 0.06">
+                <inertial pos="0 0 0" mass="0.5" diaginertia="0.01 0.01 0.01"/>
+                <joint name="right_joint_2" pos="0 0 0" axis="1 0 0" range="-1.57 1.57" actuatorfrcrange="-12 12" damping="0.25" frictionloss="0.02"/>
+                <geom pos="-0.0301 0 -0.1225" type="mesh" group="1" density="0" mesh="link21"/>
+                <body name="right_link3" pos="-0.0301 0 0.06625">
+                  <inertial pos="0 0 0" mass="0.4" diaginertia="0.01 0.01 0.01"/>
+                  <joint name="right_joint_3" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-10 10" damping="0.25" frictionloss="0.02"/>
+                  <geom pos="0 0 -0.18875" quat="1 0 0 0" type="mesh" group="1" density="0" mesh="link31"/>
+                  <body name="right_link4" pos="0 0.0315 0.15375">
+                    <inertial pos="0 0 0" mass="0.4" diaginertia="0.01 0.01 0.01"/>
+                    <joint name="right_joint_4" pos="0 0 0" axis="0 1 0" range="-1.57 1.57" actuatorfrcrange="-10 10" damping="0.25" frictionloss="0.02"/>
+                    <geom pos="0 -0.0315 -0.3425" type="mesh" group="1" density="0" mesh="link4"/>
+                    <body name="right_link5" pos="0 -0.0315 0.0955">
+                      <inertial pos="0 0 0" mass="0.3" diaginertia="0.005 0.005 0.005"/>
+                      <joint name="right_joint_5" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-10 10" damping="0.25" frictionloss="0.02"/>
+                      <geom pos="0 0 -0.438" quat="1 0 0 0" type="mesh" group="1" density="0" mesh="link5"/>
+                      <body name="right_link6" pos="0.0375 0 0.1205">
+                        <inertial pos="0 0 0" mass="0.2" diaginertia="0.005 0.005 0.005"/>
+                        <joint name="right_joint_6" pos="0 0 0" axis="1 0 0" range="-1.57 1.57" actuatorfrcrange="-10 10" damping="0.25" frictionloss="0.02"/>
+                        <geom pos="-0.0375 0 -0.5585" quat="1 0 0 0" type="mesh" group="1" density="0" mesh="link6"/>
+                        <body name="right_link7" pos="-0.0375 0 0">
+                          <inertial pos="0 0 0" mass="0.1" diaginertia="0.002 0.002 0.002"/>
+                          <joint name="right_joint_7" pos="0 0 0" axis="0 1 0" range="-3.14 3.14" actuatorfrcrange="-10 10" damping="0.25" frictionloss="0.02"/>
+                          <geom pos="0 0 -0.5585" type="mesh" group="1" density="0" mesh="link7"/>
+                          <body name="right_finger_1" pos="0 0.0075 0.0989">
+                            <inertial pos="0 0 0" mass="0.01" diaginertia="1e-05 1e-05 1e-05"/>
+                            <joint name="right_finger_joint1" pos="0 0 0" axis="0 1 0" type="slide" range="0 0.044" actuatorfrcrange="-0.1 0.1" damping="0.25" frictionloss="0.02"/>
+                            <geom size="0.005 0.004 0.02" pos="0 0 0.02" type="box" group="1" density="0" rgba="0.4 0.4 0.4 1"/>
+                          </body>
+                          <body name="right_finger_2" pos="0 -0.0045 0.0989">
+                            <inertial pos="0 0 0" mass="0.01" diaginertia="1e-05 1e-05 1e-05"/>
+                            <joint name="right_finger_joint2" pos="0 0 0" axis="0 -1 0" type="slide" range="0 0.044" actuatorfrcrange="-0.1 0.1" damping="0.25" frictionloss="0.02"/>
+                            <geom size="0.005 0.004 0.02" pos="0 0 0.02" type="box" group="1" density="0" rgba="0.4 0.4 0.4 1"/>
+                          </body>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+    <body name="omxf_stand" pos="0.6 -0.3 0">
+      <geom size="0.1 0.1 0.4" pos="0 0 0.4" type="box" rgba="0.3 0.3 0.3 1"/>
+      <body name="omxf_root" pos="0 0 0.8">
+        <body name="omxf_link0">
+          <geom type="mesh" rgba="0.2 0.2 0.2 1" mesh="omxf_link0_mesh"/>
+          <body name="omxf_link1" pos="0.01125 0 0.034">
+            <joint name="omxf_joint1" pos="0 0 0" axis="0 0 1" range="-3.14159 3.14159" armature="0.001" damping="0.3" frictionloss="0.02"/>
+            <geom type="mesh" rgba="0.2 0.2 0.2 1" mesh="omxf_link1_mesh"/>
+            <body name="omxf_link2" pos="0 0 0.0635">
+              <joint name="omxf_joint2" pos="0 0 0" axis="0 1 0" range="-3.14159 3.14159" armature="0.001" damping="0.3" frictionloss="0.02"/>
+              <geom type="mesh" rgba="0.2 0.2 0.2 1" mesh="omxf_link2_mesh"/>
+              <body name="omxf_link3" pos="0.0415 0 0.11315">
+                <joint name="omxf_joint3" pos="0 0 0" axis="0 1 0" range="-3.14159 3.14159" armature="0.001" damping="0.3" frictionloss="0.02"/>
+                <geom type="mesh" rgba="0.2 0.2 0.2 1" mesh="omxf_link3_mesh"/>
+                <body name="omxf_link4" pos="0.162 0 0">
+                  <joint name="omxf_joint4" pos="0 0 0" axis="0 1 0" range="-3.14159 3.14159" armature="0.001" damping="0.3" frictionloss="0.02"/>
+                  <geom type="mesh" rgba="0.2 0.2 0.2 1" mesh="omxf_link4_mesh"/>
+                  <body name="omxf_link5" pos="0.0287 0 0">
+                    <joint name="omxf_joint5" pos="0 0 0" axis="1 0 0" range="-3.14159 3.14159" armature="0.001" damping="0.3" frictionloss="0.02"/>
+                    <geom type="mesh" rgba="0.2 0.2 0.2 1" mesh="omxf_link5_mesh"/>
+                    <body name="omxf_link6" pos="0.0295 0.0075 0">
+                      <joint name="omxf_gripper_joint_1" pos="0 0 0" axis="0 0 1" range="-3.14159 3.14159" armature="0.001" damping="0.3" frictionloss="0.02"/>
+                      <geom type="mesh" rgba="0.2 0.2 0.2 1" mesh="omxf_link6_mesh"/>
+                    </body>
+                    <body name="omxf_link7" pos="0.0295 -0.0108 0">
+                      <joint name="omxf_gripper_joint_2" pos="0 0 0" axis="0 0 1" range="-3.14159 3.14159" armature="0.001" damping="0.3" frictionloss="0.02"/>
+                      <geom type="mesh" rgba="0.2 0.2 0.2 1" mesh="omxf_link7_mesh"/>
+                    </body>
+                    <body name="omxf_end_effector_link" pos="0.09193 -0.0016 0"/>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+    <body name="pinky_base" pos="0 1.2 0">
+      <inertial pos="-0.2 0 0.08" mass="15" diaginertia="0.4 0.6 0.8"/>
+      <joint name="pinky_base_free" type="free"/>
+      <body name="pinky_base_footprint">
+        <body name="pinky_base_link" pos="0 0 0.0325">
+          <geom name="pinky_chassis" size="0.3 0.2 0.07" pos="-0.2 0 0.05" type="box" rgba="0.2 0.2 0.2 1"/>
+          <geom name="pinky_top_plate" size="0.3 0.2 0.015" pos="-0.2 0 0.6" type="box" rgba="0.2 0.2 0.2 1"/>
+          <geom name="pinky_pillar_fl" size="0.015 0.015 0.25" pos="0.085 0.185 0.37" type="box" rgba="0.2 0.2 0.2 1"/>
+          <geom name="pinky_pillar_fr" size="0.015 0.015 0.25" pos="0.085 -0.185 0.37" type="box" rgba="0.2 0.2 0.2 1"/>
+          <geom name="pinky_pillar_rl" size="0.015 0.015 0.25" pos="-0.485 0.185 0.37" type="box" rgba="0.2 0.2 0.2 1"/>
+          <geom name="pinky_pillar_rr" size="0.015 0.015 0.25" pos="-0.485 -0.185 0.37" type="box" rgba="0.2 0.2 0.2 1"/>
+          <geom name="pinky_caster_l" size="0.0325" pos="-0.4 0.1 -0.05" friction="0.05 0.001" rgba="0.2 0.2 0.2 1"/>
+          <geom name="pinky_caster_r" size="0.0325" pos="-0.4 -0.1 -0.05" friction="0.05 0.001" rgba="0.2 0.2 0.2 1"/>
+          <body name="pinky_lidar_mount" pos="0 0 0.18">
+            <geom name="pinky_lidar_mesh" type="mesh" rgba="0 0 1 1" mesh="vicpinky_lidar_mesh"/>
+            <geom name="pinky_lidar_box" size="0.035 0.035 0.035" pos="0 0 -0.035" type="box" rgba="0 0 1 1"/>
+          </body>
+          <body name="pinky_left_wheel" pos="0 0.2375 0" quat="0.707109 -0.707105 0 0">
+            <joint name="pinky_left_wheel_joint" pos="0 0 0" axis="0 0 1" damping="0.01"/>
+            <geom size="0.0825 0.025" type="cylinder" friction="2 0.02 0.001" rgba="0 0 0 1"/>
+          </body>
+          <body name="pinky_right_wheel" pos="0 -0.2375 0" quat="0.707109 0.707105 0 0">
+            <joint name="pinky_right_wheel_joint" pos="0 0 0" axis="0 0 -1" damping="0.01"/>
+            <geom size="0.0825 0.025" type="cylinder" friction="2 0.02 0.001" rgba="0 0 0 1"/>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <general name="omxf_joint1_ctrl" joint="omxf_joint1" ctrllimited="true" ctrlrange="-3.14159 3.14159" biastype="affine" gainprm="100" biasprm="0 -100"/>
+    <general name="omxf_joint2_ctrl" joint="omxf_joint2" ctrllimited="true" ctrlrange="-3.14159 3.14159" biastype="affine" gainprm="100" biasprm="0 -100"/>
+    <general name="omxf_joint3_ctrl" joint="omxf_joint3" ctrllimited="true" ctrlrange="-3.14159 3.14159" biastype="affine" gainprm="100" biasprm="0 -100"/>
+    <general name="omxf_joint4_ctrl" joint="omxf_joint4" ctrllimited="true" ctrlrange="-3.14159 3.14159" biastype="affine" gainprm="100" biasprm="0 -100"/>
+    <general name="omxf_joint5_ctrl" joint="omxf_joint5" ctrllimited="true" ctrlrange="-3.14159 3.14159" biastype="affine" gainprm="100" biasprm="0 -100"/>
+    <general name="omxf_gripper_joint_1_ctrl" joint="omxf_gripper_joint_1" ctrllimited="true" ctrlrange="-3.14159 3.14159" biastype="affine" gainprm="100" biasprm="0 -100"/>
+    <general name="omxf_gripper_joint_2_ctrl" joint="omxf_gripper_joint_2" ctrllimited="true" ctrlrange="-3.14159 3.14159" biastype="affine" gainprm="100" biasprm="0 -100"/>
+    <general name="pinky_left_wheel_joint_ctrl" joint="pinky_left_wheel_joint" ctrllimited="true" ctrlrange="-10 10" biastype="affine" gainprm="150" biasprm="0 0 -150"/>
+    <general name="pinky_right_wheel_joint_ctrl" joint="pinky_right_wheel_joint" ctrllimited="true" ctrlrange="-10 10" biastype="affine" gainprm="150" biasprm="0 0 -150"/>
+    <general name="left_joint1_ctrl" joint="left_joint_1" ctrllimited="true" ctrlrange="-10 10" biastype="affine" gainprm="200" biasprm="0 -200"/>
+    <general name="left_joint2_ctrl" joint="left_joint_2" ctrllimited="true" ctrlrange="-12 12" biastype="affine" gainprm="200" biasprm="0 -200"/>
+    <general name="left_joint3_ctrl" joint="left_joint_3" ctrllimited="true" ctrlrange="-10 10" biastype="affine" gainprm="200" biasprm="0 -200"/>
+    <general name="left_joint4_ctrl" joint="left_joint_4" ctrllimited="true" ctrlrange="-10 10" biastype="affine" gainprm="200" biasprm="0 -200"/>
+    <general name="left_joint5_ctrl" joint="left_joint_5" ctrllimited="true" ctrlrange="-10 10" biastype="affine" gainprm="200" biasprm="0 -200"/>
+    <general name="left_joint6_ctrl" joint="left_joint_6" ctrllimited="true" ctrlrange="-10 10" biastype="affine" gainprm="200" biasprm="0 -200"/>
+    <general name="left_joint7_ctrl" joint="left_joint_7" ctrllimited="true" ctrlrange="-10 10" biastype="affine" gainprm="200" biasprm="0 -200"/>
+    <general name="left_finger_ctrl" joint="left_finger_joint1" ctrllimited="true" ctrlrange="-0.1 0.1" biastype="affine" gainprm="50" biasprm="0 -50"/>
+    <general name="right_joint1_ctrl" joint="right_joint_1" ctrllimited="true" ctrlrange="-10 10" biastype="affine" gainprm="200" biasprm="0 -200"/>
+    <general name="right_joint2_ctrl" joint="right_joint_2" ctrllimited="true" ctrlrange="-12 12" biastype="affine" gainprm="200" biasprm="0 -200"/>
+    <general name="right_joint3_ctrl" joint="right_joint_3" ctrllimited="true" ctrlrange="-10 10" biastype="affine" gainprm="200" biasprm="0 -200"/>
+    <general name="right_joint4_ctrl" joint="right_joint_4" ctrllimited="true" ctrlrange="-10 10" biastype="affine" gainprm="200" biasprm="0 -200"/>
+    <general name="right_joint5_ctrl" joint="right_joint_5" ctrllimited="true" ctrlrange="-10 10" biastype="affine" gainprm="200" biasprm="0 -200"/>
+    <general name="right_joint6_ctrl" joint="right_joint_6" ctrllimited="true" ctrlrange="-10 10" biastype="affine" gainprm="200" biasprm="0 -200"/>
+    <general name="right_joint7_ctrl" joint="right_joint_7" ctrllimited="true" ctrlrange="-10 10" biastype="affine" gainprm="200" biasprm="0 -200"/>
+    <general name="right_finger_ctrl" joint="right_finger_joint1" ctrllimited="true" ctrlrange="-0.1 0.1" biastype="affine" gainprm="50" biasprm="0 -50"/>
+  </actuator>
+</mujoco>

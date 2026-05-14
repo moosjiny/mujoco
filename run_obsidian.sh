@@ -1,0 +1,1 @@
+/home/moos/Apps/obsidian-extracted/obsidian
