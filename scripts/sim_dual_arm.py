@@ -4,6 +4,7 @@ import rerun as rr
 import numpy as np
 import time
 import os
+import threading
 import trimesh
 import json
 import urllib.request
@@ -16,6 +17,22 @@ DASHBOARD_URL = "http://localhost:8000/update"
 # VERSIONED PATHS
 ROBOT_ROOT = "world/robot_v4"
 
+# ROOPS Continuum NTFY publishing (no-op if env vars unset).
+# Topic name is a secret — only read from MUJOCO_TOPIC_SIM, never log/print/inline.
+NTFY_BASE        = os.environ.get("NTFY_BASE", "")
+MUJOCO_TOPIC_SIM = os.environ.get("MUJOCO_TOPIC_SIM", "")
+SIM_PUBLISH_HZ   = 10
+
+# qpos layout (verified against build_mjcf.py output 2026-05-15):
+#   [0:18]   bimanual: left arm(7) + left fingers(2) + right arm(7) + right fingers(2)
+#   [18:25]  omxf single arm: joints 1-5 + 2 grippers
+#   [25:32]  pinky_base_free: xyz + quat (wxyz)
+#   [32:34]  pinky wheels: left, right
+QPOS_BIMANUAL_SLICE = (0, 18)
+QPOS_OMXF_SLICE     = (18, 25)
+QPOS_PINKY_BASE_SLICE  = (25, 32)
+QPOS_PINKY_WHEEL_SLICE = (32, 34)
+
 def send_to_dashboard(data_dict):
     try:
         req = urllib.request.Request(DASHBOARD_URL, data=json.dumps(data_dict).encode('utf-8'), headers={'Content-Type': 'application/json'})
@@ -23,6 +40,36 @@ def send_to_dashboard(data_dict):
             pass
     except Exception:
         pass
+
+def _post_sim_state_async(payload_bytes, url):
+    try:
+        req = urllib.request.Request(url, data=payload_bytes, method="POST",
+                                     headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=0.2):
+            pass
+    except Exception:
+        pass
+
+def publish_sim_state(data, pinky_body_id):
+    if not (NTFY_BASE and MUJOCO_TOPIC_SIM):
+        return
+    bi0, bi1 = QPOS_BIMANUAL_SLICE
+    o0, o1   = QPOS_OMXF_SLICE
+    pb0, pb1 = QPOS_PINKY_BASE_SLICE
+    pw0, pw1 = QPOS_PINKY_WHEEL_SLICE
+    state = {
+        "ts": time.time(),
+        "bimanual": {"qpos": data.qpos[bi0:bi1].tolist()},
+        "omxf":     {"qpos": data.qpos[o0:o1].tolist()},
+        "pinky": {
+            "base_qpos":  data.qpos[pb0:pb1].tolist(),
+            "wheel_qpos": data.qpos[pw0:pw1].tolist(),
+            "xpos":       data.xpos[pinky_body_id].tolist() if pinky_body_id >= 0 else None,
+        },
+    }
+    payload = json.dumps(state).encode("utf-8")
+    url = f"{NTFY_BASE}/{MUJOCO_TOPIC_SIM}"
+    threading.Thread(target=_post_sim_state_async, args=(payload, url), daemon=True).start()
 
 def run_sim():
     # 1. Load MuJoCo Model
@@ -148,6 +195,7 @@ def run_sim():
         start_time = time.time()
         last_render_time = 0
         last_dashboard_time = 0
+        last_sim_pub_time = 0
         RENDER_FPS = 30
         DASHBOARD_FPS = 10
         
@@ -217,6 +265,11 @@ def run_sim():
                 }
                 send_to_dashboard(update_data)
                 last_dashboard_time = t
+
+            # Publish sim-state to ROOPS NTFY (no-op if env vars unset)
+            if t - last_sim_pub_time > (1.0 / SIM_PUBLISH_HZ):
+                publish_sim_state(data, PINKY_BASE_BID)
+                last_sim_pub_time = t
 
             # Sync Rerun
             if t - last_render_time > (1.0 / RENDER_FPS):

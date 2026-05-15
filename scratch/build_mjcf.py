@@ -242,6 +242,25 @@ ee = link5.add_body()
 ee.name = "omxf_end_effector_link"
 ee.pos  = OMXF_EE_OFFSET
 
+# ---------- 6b. IK mocap targets ----------
+# sim_ros2_ik.py looks these up by name and drives them via RViz interactive markers
+# (/target_{left,right}/pose_cmd). contype=2/conaffinity=0 keeps them visible but
+# non-colliding with the arms.
+for tname, tpos, trgba in [
+    ("target_left",  [0, -0.541, 0.773], [1, 0, 0, 0.5]),
+    ("target_right", [0,  0.541, 0.773], [0, 0, 1, 0.5]),
+]:
+    tb = spec.worldbody.add_body()
+    tb.name  = tname
+    tb.pos   = tpos
+    tb.mocap = True
+    tg = tb.add_geom()
+    tg.type        = mujoco.mjtGeom.mjGEOM_SPHERE
+    tg.size        = [0.08, 0, 0]
+    tg.contype     = 2
+    tg.conaffinity = 0
+    tg.rgba        = trgba
+
 # ---------- 7. Vicpinky body tree ----------
 pinky_base = spec.worldbody.add_body()
 pinky_base.name = "pinky_base"
