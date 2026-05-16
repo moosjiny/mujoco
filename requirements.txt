@@ -8,6 +8,7 @@ etils==1.14.0
 fastapi==0.136.1
 fsspec==2026.3.0
 glfw==2.10.0
+gymnasium>=0.29
 h11==0.16.0
 idna==3.13
 Jinja2==3.1.6
