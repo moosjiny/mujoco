@@ -12,6 +12,8 @@ Composition:
                                  chassis box + 2 wheels; the real chassis (top plate,
                                  4 aluminum pillars, casters, LiDAR mount) lives here.
   * Environment               -> headlight, skybox, checker ground, sun light.
+  * Cameras                   -> overview (top-down) + front_right (angled): both capture
+                                 all 3 robots in one frame for LeRobot gym rendering.
 
 If you tweak OMX-F joint origins or vicpinky geometry, do it here — regenerating then
 overwrites urdf/dual_openarm.xml exactly. Visual no-op for everything else.
@@ -186,6 +188,29 @@ sun.dir        = [-0.3, 0.3, -1]
 sun.diffuse    = [0.7, 0.7, 0.65]
 sun.specular   = [0.2, 0.2, 0.2]
 sun.castshadow = True
+
+# ---------- 5b. Scene cameras (3개 로봇 모두 시야에) ----------
+# 쌍 배치:
+#   양팔 OpenArm  : origin (0, 0, 0)
+#   OMX-F stand: (0.6, -0.3, 0.8)
+#   vicpinky   : (0, 1.2, 0)
+#   사실상 중심 : (0.2, 0.3, 0.5)
+
+# overview: 수직 하강 탑뷰. xyaxes=[x=우, y=앞] → 카메라 z=위 → -z=아래 직시
+_cam_ov = spec.worldbody.add_camera()
+_cam_ov.name   = "overview"
+_cam_ov.pos    = [0.2, 0.3, 4.5]
+_cam_ov.xyaxes = [1, 0, 0, 0, 1, 0]
+_cam_ov.fovy   = 70
+
+# front_right: 우전방 사얼었기. zaxis = cam_pos - lookat (날고 있는 방향의 반대)
+# lookat=(0.2, 0.3, 0.5), pos=(2.5, -2.0, 1.8)
+# zaxis_raw=(2.3, -2.3, 1.3), |v|=3.503, normalized=(0.657, -0.657, 0.371)
+_cam_fr = spec.worldbody.add_camera()
+_cam_fr.name  = "front_right"
+_cam_fr.pos   = [2.5, -2.0, 1.8]
+_cam_fr.zaxis = [0.657, -0.657, 0.371]
+_cam_fr.fovy  = 55
 
 # ---------- 6. OMX-F body tree ----------
 omxf_stand = spec.worldbody.add_body()
@@ -368,3 +393,4 @@ with open(OUT, "w") as f:
 
 print(f"Saved merged model to {OUT}")
 print(f"  njnt={m.njnt}  nu={m.nu}  nbody={m.nbody}  nmesh={m.nmesh}")
+print(f"  cameras: {[m.camera(i).name for i in range(m.ncam)]}")
