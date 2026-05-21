@@ -56,4 +56,4 @@
 | [10_Daily_Logs/2026-04-27_session_progress.md](10_Daily_Logs/2026-04-27_session_progress.md) | 2026-04-27 세션 — 듀얼암 작업 보고 | 2026-05-14 | 2026-05-15: 초기 등록 |
 | [10_Daily_Logs/2026-05-07_session_progress.md](10_Daily_Logs/2026-05-07_session_progress.md) | 2026-05-07 세션 정리 | 2026-05-14 | 2026-05-15: 초기 등록 |
 | [10_Daily_Logs/2026-05-11_ros2_setup_ex04.md](10_Daily_Logs/2026-05-11_ros2_setup_ex04.md) | 2026-05-11 세션 — ROS2 + ex04 | 2026-05-14 | 2026-05-15: 초기 등록 |
-| [30_Troubleshooting/ntfy_auth_outage_20260521.md](30_Troubleshooting/ntfy_auth_outage_20260521.md) | NTFY 인증 장애(403→429) 인시던트 — 원인·발신 보고서 3건·복구 계획 (진행 중) | 2026-05-21 | 2026-05-21: 신규 등록 |
+| [30_Troubleshooting/ntfy_auth_outage_20260521.md](30_Troubleshooting/ntfy_auth_outage_20260521.md) | NTFY 인증 장애(403→429) 인시던트 — 원인·발신 보고서·복구 진행 (자격증명 적용·인증 확인, exempt-host 대기) | 2026-05-21 | 2026-05-21: 자격증명 적용·인증 검증(200)·유닛 auth-ready 반영, exempt-host 블로커 기록 |

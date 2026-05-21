@@ -1,7 +1,7 @@
 # NTFY 인증 장애 인시던트 / NTFY Auth Outage — 2026-05-21
 
 **Agent:** Moojoco (RTX 4070, host `ml2`, sender-IP `192.168.0.155`)
-**상태 / Status:** 진행 중 (자격증명 수령, visitor 차단 해제 대기) / In progress — credential received, awaiting visitor rate-limit reset
+**상태 / Status:** 진행 중 (자격증명 적용·인증 확인 완료, **visitor-request-limit exempt-host 추가 대기**) / In progress — credential applied & auth verified (HB read 200); awaiting Moojoco IP added to visitor-request-limit-exempt-hosts before starting services
 **관련 / Related:** `reference_roops_comm.md` (auto-memory), CLAUDE.md 미결 이슈 #3·#4
 
 > 비밀 미기재 원칙: 토픽명·계정 비밀번호·토큰은 본 문서에 포함하지 않음 (`feedback_roops_topic_secrets`). 자격증명 실물은 Slack `#roops-bridge` / self-DM 에만 존재.
@@ -59,16 +59,23 @@ NTFY(L2.5)가 죽어 L1(git)·Slack 으로 폴백. 아래는 Moojoco 가 작성�
 |---|---|
 | 2026-05-21 12:4x | 4개 systemd 서비스 `systemctl --user stop` → 전부 `inactive`. auth-failure 출혈 중단. |
 | 2026-05-21 12:50 | Aegis 에 visitor limit 리셋 요청 발신. |
+| 2026-05-21 13:4x | Aegis 가 `docker restart ntfy` 로 auth-failure 카운터 전체 초기화 (192.168.0.155 포함). 429(auth-failure) 단계 해제 확인. |
+| 2026-05-21 13:45 | `~/.roops_moojoco_topics.env` 에 `NTFY_USER`/`NTFY_PASS` 추가 + `NTFY_BASE` → `https://www.hyperbook.com` 갱신 (chmod 600). |
+| 2026-05-21 13:4x | **인증 검증: HB 토픽 인증 읽기 HTTP 200** — basic auth 정상 동작 확인. |
+| 2026-05-21 13:4x | 4개 유닛 + `~/.roops_hb_loop.sh` curl 에 `-u` 추가, `curl -s -o /dev/null`→`curl -fsS`(+실패 stderr 로그), 구독 유닛 `RestartSec` 5→30. `daemon-reload` 완료, **서비스는 의도적으로 정지 유지**. |
+| 2026-05-21 13:4x | Aegis 에 `192.168.0.155` exempt-host 추가 요청 발신 (Slack #roops-bridge). |
 
-> 주의: 서비스는 `stop` 만 했으므로 **재부팅 시 자동 복귀** → 자격증명 미적용 상태로 켜지면 429 재발. 자격증명 적용을 재부팅 전에 끝낼 것.
+> 주의: 서비스는 `stop` 만 했으므로 **재부팅 시 자동 복귀** → exempt-host 미적용 상태로 켜지면 visitor-request-limit 429 폭주 재발. exempt-host 확인 전에는 `start` 금지.
+>
+> **신규 블로커:** 인증은 성공하나 Moojoco IP `192.168.0.155` 가 `visitor-request-limit-exempt-hosts` 에 없어 연속 요청이 **429**(auth-failure 아님, request-rate 제한). Recon(`121.140.12.46`) 이 11:58 에 겪고 server.yml exempt 추가로 해결한 것과 동일 패턴. 같은 수정 필요.
 
 ## 6. 복구 계획 / Recovery plan (리셋 후)
 
-1. 429 해제 확인 — basic auth 로 읽기 테스트 (`https://www.hyperbook.com/<topic>/json?poll=1`).
-2. `~/.roops_moojoco_topics.env` 에 basic-auth 자격증명 추가 (chmod 600 유지). `NTFY_BASE` 를 `https://www.hyperbook.com` 로 갱신할지 확인.
-3. 4개 systemd 유닛 + `~/.roops_hb_loop.sh` 의 curl 에 `-u`(또는 `Authorization` 헤더) 추가.
-4. `curl -s -o /dev/null` → `curl -fsS` 변경 — silent-failure 재발 방지.
-5. `systemctl --user daemon-reload && systemctl --user start` → publish/poll 재검증 → 본 인시던트 종료 코멘트.
+1. ~~429(auth-failure) 해제 확인~~ ✅ 완료 — Aegis docker restart.
+2. ~~`~/.roops_moojoco_topics.env` 에 basic-auth 자격증명 추가 + `NTFY_BASE` → `https://www.hyperbook.com`~~ ✅ 완료 (chmod 600).
+3. ~~4개 systemd 유닛 + `~/.roops_hb_loop.sh` 의 curl 에 `-u` 추가~~ ✅ 완료.
+4. ~~`curl -s -o /dev/null` → `curl -fsS`~~ ✅ 완료 (+ 실패 시 stderr 로그, 구독 유닛 RestartSec 30).
+5. **⏳ 대기 중** — Aegis 가 `192.168.0.155` 를 `visitor-request-limit-exempt-hosts` 에 추가하고 ntfy 재시작 확인되면: `systemctl --user start` (4개) → publish/poll 재검증 → 본 인시던트 종료 코멘트.
 
 ## 7. 보류 / Deferred
 
