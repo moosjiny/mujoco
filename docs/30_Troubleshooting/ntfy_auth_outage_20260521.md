@@ -1,7 +1,7 @@
 # NTFY 인증 장애 인시던트 / NTFY Auth Outage — 2026-05-21
 
 **Agent:** Moojoco (RTX 4070, host `ml2`, sender-IP `192.168.0.155`)
-**상태 / Status:** 진행 중 (자격증명 적용·인증 확인 완료, **visitor-request-limit exempt-host 추가 대기**) / In progress — credential applied & auth verified (HB read 200); awaiting Moojoco IP added to visitor-request-limit-exempt-hosts before starting services
+**상태 / Status:** 거의 복구 (exempt-host 적용 확인, 4개 서비스 기동·active, **최종 검증 대기 — 내일**) / Near-recovered — exempt-host applied (burst all-200), 4 services started & active; final verification deferred to next session
 **관련 / Related:** `reference_roops_comm.md` (auto-memory), CLAUDE.md 미결 이슈 #3·#4
 
 > 비밀 미기재 원칙: 토픽명·계정 비밀번호·토큰은 본 문서에 포함하지 않음 (`feedback_roops_topic_secrets`). 자격증명 실물은 Slack `#roops-bridge` / self-DM 에만 존재.
@@ -75,7 +75,9 @@ NTFY(L2.5)가 죽어 L1(git)·Slack 으로 폴백. 아래는 Moojoco 가 작성�
 2. ~~`~/.roops_moojoco_topics.env` 에 basic-auth 자격증명 추가 + `NTFY_BASE` → `https://www.hyperbook.com`~~ ✅ 완료 (chmod 600).
 3. ~~4개 systemd 유닛 + `~/.roops_hb_loop.sh` 의 curl 에 `-u` 추가~~ ✅ 완료.
 4. ~~`curl -s -o /dev/null` → `curl -fsS`~~ ✅ 완료 (+ 실패 시 stderr 로그, 구독 유닛 RestartSec 30).
-5. **⏳ 대기 중** — Aegis 가 `192.168.0.155` 를 `visitor-request-limit-exempt-hosts` 에 추가하고 ntfy 재시작 확인되면: `systemctl --user start` (4개) → publish/poll 재검증 → 본 인시던트 종료 코멘트.
+5. **부분 완료 / 내일 마무리** — Aegis 가 `192.168.0.155` exempt-host 적용 (Slack 응답은 없었으나 burst 3회 전부 200으로 확인). `systemctl --user start` (4개) → **전부 `active`**. ⏳ **남은 검증 (다음 세션):** (a) 재시작 폭주 멈춤 확인 — `NRestarts` ~35k 은 fix 전 누적값, 30초 간격 2회 스냅샷이 같은지(증가 없음) 확인, (b) HB 발행 테스트 200, (c) 구독 로그 `/tmp/roops_moojoco_*.log` 가 403/429 아닌 200/JSON 인지. ⏳ **미완 마무리:** 본 §6·상태 라인 "복구 완료" 확정, DOC_REGISTRY 갱신, Aegis 복구완료 ACK 발신.
+
+> 폴링 감시 루프(cron `a965da9c`)는 사용자 지시로 정지. ⚠️ `moojoco` 비밀번호 평문 노출 → 교체 대기(§7).
 
 ## 7. 보류 / Deferred
 
