@@ -1,0 +1,88 @@
+name: Hermes Bridge
+
+on:
+  workflow_dispatch:
+    inputs:
+      totp_code:
+        description: 'TOTP 6자리 코드'
+        required: true
+        type: string
+      action:
+        description: 'auth / send / events'
+        required: false
+        default: 'auth'
+        type: string
+      send_to:
+        description: 'send 대상 (broadcast 등)'
+        required: false
+        default: 'broadcast'
+        type: string
+      send_subject:
+        description: 'send 제목'
+        required: false
+        default: ''
+        type: string
+      send_body:
+        description: 'send 내용'
+        required: false
+        default: ''
+        type: string
+
+jobs:
+  bridge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: TOTP Auth
+        id: auth
+        run: |
+          RESP=$(curl -s -X POST "https://ec2.hyperbook.com/hermes/totp" \
+            -H "Content-Type: application/json" \
+            -d "{\"code\": \"${{ inputs.totp_code }}\"}" \
+            -w "\n__HTTP_STATUS__%{http_code}")
+          HTTP_STATUS=$(echo "$RESP" | grep "__HTTP_STATUS__" | sed 's/.*__HTTP_STATUS__//')
+          BODY=$(echo "$RESP" | grep -v "__HTTP_STATUS__")
+          echo "HTTP Status: $HTTP_STATUS"
+          echo "Response: $BODY"
+          TOKEN=$(echo "$BODY" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('token',''))" 2>/dev/null || echo "")
+          echo "token=$TOKEN" >> $GITHUB_OUTPUT
+          echo "http_status=$HTTP_STATUS" >> $GITHUB_OUTPUT
+          echo "body=$BODY" >> $GITHUB_OUTPUT
+
+      - name: Write token to file
+        run: |
+          echo '${{ steps.auth.outputs.body }}' > .hermes-token
+          echo "HTTP: ${{ steps.auth.outputs.http_status }}" >> .hermes-token
+          echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> .hermes-token
+
+      - name: Fetch events (if action=events)
+        if: inputs.action == 'events'
+        run: |
+          TOKEN="${{ steps.auth.outputs.token }}"
+          if [ -z "$TOKEN" ]; then echo "No token, skipping"; exit 0; fi
+          curl -s "https://ec2.hyperbook.com/hermes/events" \
+            -H "Authorization: Bearer $TOKEN" \
+            --max-time 10 >> .hermes-token 2>&1 || true
+
+      - name: Send message (if action=send)
+        if: inputs.action == 'send'
+        run: |
+          TOKEN="${{ steps.auth.outputs.token }}"
+          if [ -z "$TOKEN" ]; then echo "No token, skipping"; exit 0; fi
+          RESP=$(curl -s -X POST "https://ec2.hyperbook.com/hermes/send" \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"to\": \"${{ inputs.send_to }}\", \"subject\": \"${{ inputs.send_subject }}\", \"body\": \"${{ inputs.send_body }}\"}")
+          echo "Send response: $RESP" >> .hermes-token
+
+      - name: Commit result
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .hermes-token
+          git commit -m "chore: hermes bridge result $(date -u +%H:%M:%S)" || echo "No changes"
+          git push
