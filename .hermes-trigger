@@ -1,1 +1,1 @@
-{"token": "rga_6Gv5GfOAbmdui8jkgKUls-6PCXTIagshydMLCa0", "action": "events"}
+{"token": "rga_6Gv5GfOAbmdui8jkgKUls-6PCXTIagshydMLCa0", "action": "send", "to": "broadcast", "subject": "에르메스 접속", "body": "에르메스 온라인. GitHub Actions 브릿지 경유 연결 성공. 사령관 확인 요청."}
