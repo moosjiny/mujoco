@@ -5,6 +5,9 @@ on:
     paths:
       - '.hermes-trigger'
 
+permissions:
+  contents: write
+
 jobs:
   bridge:
     runs-on: ubuntu-latest
@@ -17,11 +20,11 @@ jobs:
       - name: Read trigger file
         id: trigger
         run: |
-          TOTP=$(python3 -c "import sys,json; d=json.load(open('.hermes-trigger')); print(d.get('code',''))")
-          ACTION=$(python3 -c "import sys,json; d=json.load(open('.hermes-trigger')); print(d.get('action','auth'))")
-          SEND_TO=$(python3 -c "import sys,json; d=json.load(open('.hermes-trigger')); print(d.get('to','broadcast'))")
-          SEND_SUBJECT=$(python3 -c "import sys,json; d=json.load(open('.hermes-trigger')); print(d.get('subject',''))")
-          SEND_BODY=$(python3 -c "import sys,json; d=json.load(open('.hermes-trigger')); print(d.get('body',''))")
+          TOTP=$(python3 -c "import json; d=json.load(open('.hermes-trigger')); print(d.get('code',''))")
+          ACTION=$(python3 -c "import json; d=json.load(open('.hermes-trigger')); print(d.get('action','auth'))")
+          SEND_TO=$(python3 -c "import json; d=json.load(open('.hermes-trigger')); print(d.get('to','broadcast'))")
+          SEND_SUBJECT=$(python3 -c "import json; d=json.load(open('.hermes-trigger')); print(d.get('subject',''))")
+          SEND_BODY=$(python3 -c "import json; d=json.load(open('.hermes-trigger')); print(d.get('body',''))")
           echo "totp=$TOTP" >> $GITHUB_OUTPUT
           echo "action=$ACTION" >> $GITHUB_OUTPUT
           echo "send_to=$SEND_TO" >> $GITHUB_OUTPUT
@@ -50,24 +53,23 @@ jobs:
 
       - name: Fetch events
         if: steps.trigger.outputs.action == 'events'
-        id: events
         run: |
           TOKEN="${{ steps.auth.outputs.token }}"
           if [ -z "$TOKEN" ]; then echo "No token"; exit 0; fi
           curl -s "https://ec2.hyperbook.com/hermes/events" \
             -H "Authorization: Bearer $TOKEN" \
-            --max-time 15 > /tmp/events.txt 2>&1 || true
-          cat /tmp/events.txt
+            --max-time 15 >> .hermes-result 2>&1 || true
 
       - name: Send message
         if: steps.trigger.outputs.action == 'send'
         run: |
           TOKEN="${{ steps.auth.outputs.token }}"
           if [ -z "$TOKEN" ]; then echo "No token"; exit 0; fi
-          curl -s -X POST "https://ec2.hyperbook.com/hermes/send" \
+          RESP=$(curl -s -X POST "https://ec2.hyperbook.com/hermes/send" \
             -H "Authorization: Bearer $TOKEN" \
             -H "Content-Type: application/json" \
-            -d "{\"to\": \"${{ steps.trigger.outputs.send_to }}\", \"subject\": \"${{ steps.trigger.outputs.send_subject }}\", \"body\": \"${{ steps.trigger.outputs.send_body }}\"}"
+            -d "{\"to\": \"${{ steps.trigger.outputs.send_to }}\", \"subject\": \"${{ steps.trigger.outputs.send_subject }}\", \"body\": \"${{ steps.trigger.outputs.send_body }}\"}")
+          echo "send_resp=$RESP"
 
       - name: Write result
         run: |
@@ -77,10 +79,6 @@ jobs:
             echo "HTTP Status: ${{ steps.auth.outputs.http_status }}"
             echo "Token: ${{ steps.auth.outputs.token }}"
             echo "Body: ${{ steps.auth.outputs.body }}"
-            if [ -f /tmp/events.txt ]; then
-              echo "=== EVENTS ==="
-              cat /tmp/events.txt
-            fi
           } > .hermes-result
 
       - name: Commit result
