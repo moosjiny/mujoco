@@ -1,32 +1,9 @@
 name: Hermes Bridge
 
 on:
-  workflow_dispatch:
-    inputs:
-      totp_code:
-        description: 'TOTP 6자리 코드'
-        required: true
-        type: string
-      action:
-        description: 'auth / send / events'
-        required: false
-        default: 'auth'
-        type: string
-      send_to:
-        description: 'send 대상 (broadcast 등)'
-        required: false
-        default: 'broadcast'
-        type: string
-      send_subject:
-        description: 'send 제목'
-        required: false
-        default: ''
-        type: string
-      send_body:
-        description: 'send 내용'
-        required: false
-        default: ''
-        type: string
+  push:
+    paths:
+      - '.hermes-trigger'
 
 jobs:
   bridge:
@@ -37,52 +14,84 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Read trigger file
+        id: trigger
+        run: |
+          TOTP=$(cat .hermes-trigger | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('code',''))")
+          ACTION=$(cat .hermes-trigger | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('action','auth'))")
+          SEND_TO=$(cat .hermes-trigger | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('to','broadcast'))")
+          SEND_SUBJECT=$(cat .hermes-trigger | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('subject',''))")
+          SEND_BODY=$(cat .hermes-trigger | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('body',''))")
+          echo "totp=$TOTP" >> $GITHUB_OUTPUT
+          echo "action=$ACTION" >> $GITHUB_OUTPUT
+          echo "send_to=$SEND_TO" >> $GITHUB_OUTPUT
+          echo "send_subject=$SEND_SUBJECT" >> $GITHUB_OUTPUT
+          echo "send_body=$SEND_BODY" >> $GITHUB_OUTPUT
+
       - name: TOTP Auth
         id: auth
         run: |
           RESP=$(curl -s -X POST "https://ec2.hyperbook.com/hermes/totp" \
             -H "Content-Type: application/json" \
-            -d "{\"code\": \"${{ inputs.totp_code }}\"}" \
-            -w "\n__HTTP_STATUS__%{http_code}")
-          HTTP_STATUS=$(echo "$RESP" | grep "__HTTP_STATUS__" | sed 's/.*__HTTP_STATUS__//')
-          BODY=$(echo "$RESP" | grep -v "__HTTP_STATUS__")
-          echo "HTTP Status: $HTTP_STATUS"
-          echo "Response: $BODY"
+            -d "{\"code\": \"${{ steps.trigger.outputs.totp }}\"}" \
+            -w "\n__STATUS__%{http_code}")
+          HTTP_STATUS=$(echo "$RESP" | grep "__STATUS__" | sed 's/.*__STATUS__//')
+          BODY=$(echo "$RESP" | grep -v "__STATUS__")
+          echo "HTTP: $HTTP_STATUS"
+          echo "Body: $BODY"
           TOKEN=$(echo "$BODY" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('token',''))" 2>/dev/null || echo "")
           echo "token=$TOKEN" >> $GITHUB_OUTPUT
           echo "http_status=$HTTP_STATUS" >> $GITHUB_OUTPUT
           echo "body=$BODY" >> $GITHUB_OUTPUT
 
-      - name: Write token to file
-        run: |
-          echo '${{ steps.auth.outputs.body }}' > .hermes-token
-          echo "HTTP: ${{ steps.auth.outputs.http_status }}" >> .hermes-token
-          echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> .hermes-token
-
-      - name: Fetch events (if action=events)
-        if: inputs.action == 'events'
+      - name: Fetch events
+        if: steps.trigger.outputs.action == 'events'
+        id: events
         run: |
           TOKEN="${{ steps.auth.outputs.token }}"
-          if [ -z "$TOKEN" ]; then echo "No token, skipping"; exit 0; fi
-          curl -s "https://ec2.hyperbook.com/hermes/events" \
+          if [ -z "$TOKEN" ]; then echo "No token"; exit 0; fi
+          EVENTS=$(curl -s "https://ec2.hyperbook.com/hermes/events" \
             -H "Authorization: Bearer $TOKEN" \
-            --max-time 10 >> .hermes-token 2>&1 || true
+            --max-time 15 2>&1 || true)
+          echo "events<<EOF" >> $GITHUB_OUTPUT
+          echo "$EVENTS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Send message (if action=send)
-        if: inputs.action == 'send'
+      - name: Send message
+        if: steps.trigger.outputs.action == 'send'
+        id: send
         run: |
           TOKEN="${{ steps.auth.outputs.token }}"
-          if [ -z "$TOKEN" ]; then echo "No token, skipping"; exit 0; fi
+          if [ -z "$TOKEN" ]; then echo "No token"; exit 0; fi
           RESP=$(curl -s -X POST "https://ec2.hyperbook.com/hermes/send" \
             -H "Authorization: Bearer $TOKEN" \
             -H "Content-Type: application/json" \
-            -d "{\"to\": \"${{ inputs.send_to }}\", \"subject\": \"${{ inputs.send_subject }}\", \"body\": \"${{ inputs.send_body }}\"}")
-          echo "Send response: $RESP" >> .hermes-token
+            -d "{\"to\": \"${{ steps.trigger.outputs.send_to }}\", \"subject\": \"${{ steps.trigger.outputs.send_subject }}\", \"body\": \"${{ steps.trigger.outputs.send_body }}\"}")
+          echo "send_resp=$RESP" >> $GITHUB_OUTPUT
+
+      - name: Write result
+        run: |
+          python3 -c "
+          import json, os
+          result = {
+            'auth': {
+              'http_status': '${{ steps.auth.outputs.http_status }}',
+              'body': ${{ toJson(steps.auth.outputs.body) }},
+              'token': '${{ steps.auth.outputs.token }}'
+            },
+            'events': ${{ toJson(steps.events.outputs.events) }},
+            'send': ${{ toJson(steps.send.outputs.send_resp) }},
+            'timestamp': '$(date -u +%Y-%m-%dT%H:%M:%SZ)'
+          }
+          with open('.hermes-result', 'w') as f:
+            json.dump(result, f, ensure_ascii=False, indent=2)
+          "
 
       - name: Commit result
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .hermes-token
-          git commit -m "chore: hermes bridge result $(date -u +%H:%M:%S)" || echo "No changes"
+          git pull --rebase
+          git add .hermes-result
+          git commit -m "chore: hermes result $(date -u +%H:%M:%SZ)" || echo "No changes"
           git push
