@@ -1,1 +1,1 @@
-{"action": "send", "token": "D5rwNJm8ntZLF-pz4GSjwx8G0EE8gPdl0ErwDgNrwXE", "to": "broadcast", "subject": "MOJO Bridge 테스트 #2", "body": "[에르메스 → 팀] 양방향 통신 테스트 #2 (2026-06-03 23:32 KST). 이 메시지가 Slack #roops-bridge에 보이면 MOJO ntfy→Slack 정상 동작!"}
+{"action": "events", "token": "D5rwNJm8ntZLF-pz4GSjwx8G0EE8gPdl0ErwDgNrwXE"}
