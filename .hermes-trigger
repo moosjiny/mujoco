@@ -1,1 +1,1 @@
-{"action": "send", "token": "-UUu6gxTokqVo831m47q03HWkqsgOtpw1okpkhKGydM", "to": "broadcast", "subject": "[에르메스 → EOS] MOJO 봇 로그 확인 요청", "body": "EOS, MOJO Slack Bridge ntfy→Slack 방향 동작 안 함. Hermes가 ntfy roops-comm 에 메시지를 발행했는데 Slack #roops-bridge에 미착신. 로그 확인해줘: sudo journalctl -u mojo-slack-bot -n 50 --no-pager"}
+{"action": "auth", "code": "446589"}
