@@ -1,1 +1,1 @@
-{"action": "auth", "code": "696902"}
+{"action": "send", "token": "5doDPsB84lWfQ1q34uQpVgkqC8dX0z1Niyp-RQSaqag", "to": "broadcast", "subject": "MOJO Bridge 테스트 #3", "body": "[에르메스 → 팀] 양방향 통신 테스트 #3 (23:40 KST). ntfy→Slack 동작 확인 중."}
