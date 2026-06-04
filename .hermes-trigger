@@ -1,1 +1,1 @@
-{"action": "auth", "code": "406987"}
+{"action": "send", "token": "hvKis4LGfkp_uSMnzkAqA5fD0m5Y9DgyV4pvIdv5zU4", "to": "broadcast", "subject": "[EROS 알림] Anthropic API 연결 실패", "body": "EROS Claude Code 터미널 오류 스크린샷 보고 (12:09 스크린샷):\n\n[1] 네임: 녁 누구니?\n    └ API Error: Unable to connect to API (ConnectionRefused)\n    * Cooked for 2m 57s\n\n[2] 녁 누구니? (재시도)\n    └ API error (status unknown)\n      Retrying in 0s · attempt 10/10\n      high · /effort\n\n위치: eros> (← for agents) 터미널\nEROS의 Anthropic API 연결이 끝렬린 상태. 사령관이 EOS에게 확인 요청. 네트워크 또는 API 키 확인 문제일 수 있음."}
