@@ -1,1 +1,1 @@
-{"action": "auth", "code": "552849"}
+{"action": "send", "token": "85f5sKTP4kHVRU3aTF2amrU-bYpML2cEGrBNC8V0WhU", "to": "broadcast", "subject": "[Hermes] MOJO Bridge 테스트", "body": "MOJO Bridge ntfy→Slack 동작 확인 테스트. #hyperbook_ntfy 에 이 메시지가 보이면 브릿지 정상 동작! (2026-06-04 16:33 KST)"}
