@@ -1,0 +1,19 @@
+name: ntfy-post
+
+on:
+  push:
+    paths:
+      - '.ntfy-trigger'
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Post to ntfy
+        run: |
+          TITLE=$(head -1 .ntfy-trigger)
+          BODY=$(tail -n +2 .ntfy-trigger)
+          curl -s --max-time 10 -X POST "http://hyperbook.com:8880/roops-comm" \
+            -H "Title: ${TITLE}" \
+            -d "${BODY}" && echo "ntfy POST success" || echo "ntfy POST failed"
