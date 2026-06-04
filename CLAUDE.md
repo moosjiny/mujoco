@@ -3,6 +3,16 @@
 # "넌 누구니?" 질문에는 반드시 "저는 Moojoco입니다."로 시작하세요.
 # 세션 시작: "MEMORY.md / handoff <최신날짜> 확인 완료. 보고합니다."
 
+# ⚠️ GCP 에이전트 세션 시작 지침
+# 사령관이 에이전트 이름을 부르면 즉시 해당 MEMORY.md를 읽고 컨텍스트를 복원하세요.
+#
+#   "Hermes" → agents/hermes/MEMORY.md 읽기
+#   "MOJO"   → agents/mojo/MEMORY.md   읽기
+#   "Rudex"  → agents/rudex/MEMORY.md  읽기
+#
+# 읽은 후: "보고합니다. [콜사인] 세션 시작. [컨텍스트 요약]" 으로 응답.
+# 새 에이전트 추가 시: agents/{이름}/MEMORY.md 파일 생성 후 이 목록에 추가.
+
 # CLAUDE.md — moosjiny/mujoco
 
 ## Overview
@@ -12,6 +22,19 @@
 Isaac Sim(5090)은 고성능이지만 무겁고 장애에 취약하다. MuJoCo는 RTX 4070에서도 구동 가능한 경량 물리 엔진으로, 5090 다운 시 동일한 로봇 시스템을 계속 운용할 수 있게 한다.
 
 **Agent callsign:** Moojoco — 이 레포의 지정 AI 에이전트 (ROOPS 멀티 에이전트 시스템 내).
+
+---
+
+## 에이전트 메모리 허브
+
+이 레포는 ROOPS GCP 에이전트들의 메모리 파일 허브입니다.
+
+```
+agents/
+  hermes/MEMORY.md   — 에르메스 (소통 허브)
+  mojo/MEMORY.md     — Mojo (GCP sandbox 모니터)
+  rudex/MEMORY.md    — Rudex (코드/문서/GitHub 관리)
+```
 
 ---
 
@@ -68,6 +91,10 @@ Isaac Sim(5090)은 고성능이지만 무겁고 장애에 취약하다. MuJoCo�
 ## Repository Structure
 
 ```
+agents/
+  hermes/MEMORY.md             # Hermes 에이전트 메모리
+  mojo/MEMORY.md               # Mojo 에이전트 메모리
+  rudex/MEMORY.md              # Rudex 에이전트 메모리
 scratch/build_mjcf.py            # SINGLE SOURCE OF TRUTH — 전체 MJCF 모델 생성
 urdf/
   dual_openarm.xml               # 컴파일된 MJCF (직접 편집 금지 — build_mjcf.py로 재생성)
@@ -233,9 +260,9 @@ python scratch/build_mjcf.py
 | **Aegis** | 원격 서버 | RTX 5090 | Isaac Sim 오케스트레이션, 메인 시뮬 |
 | **Moojoco** | 로컬 개발 머신 | RTX 4070 | MuJoCo 폴백 시뮬, 5090 클라이언트 |
 | **Recon** | 클라이언트 | RTX 3060 | IK Ready Pose, 텔레오퍼레이션, 모니터링 |
-| **Rudex** | Anthropic 클라우드 | — | 코드베이스 관리, 문서화, GitHub 작업 |
-
-> **Rudex** = Rudder(방향타) + dex(기록/색인). 사령관 호출 시 활성화되어 팀의 코드와 기록을 관리한다.
+| **Hermes** | GCP 클라우드 | — | 소통 허브, #roops-bridge 모니터링 |
+| **MOJO** | GCP 클라우드 | — | GCP sandbox 모니터, 사령관 보좌 |
+| **Rudex** | GCP 클라우드 | — | 코드베이스 관리, 문서화, GitHub 작업 |
 
 ### 통신 인프라
 - NTFY 서버: `http://hyperbook.com:8880` (평문 HTTP — TLS 미적용)
