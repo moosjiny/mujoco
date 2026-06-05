@@ -78,10 +78,10 @@ sleep 600 && echo "타이머"   # run_in_background: true
 
 | # | 안건 | 상태 |
 |---|------|------|
-| 1 | Memory API 연동 | HTTPS 전환 완료. **새 세션에서 접근 확인 필요** (현 세션 프록시 정책 구버전) |
+| 1 | Memory API 연동 | ✅ **종결 (2026-06-05)** — 새 세션에서 `/health` 200, save/load/msg 정상, MySQL 영속 확인 |
 | 2 | 에이전트 메모리 파일 표준화 | `agents/` 폴더 구조로 완료 |
-| 3 | ntfy 인증 개선 | 에이전트별 개별 토큰 권고, 사령관 결정 대기 |
-| 4 | Rudex Memory API 키 발급 | Aegis 발급 완료 (2026-06-05), Rudex에 전달 필요 |
+| 3 | ntfy 인증/접근 개선 | ntfy 직접 도달 불가(allowlist 미포함). **제안: `ntfy.hyperbook.com` HTTPS 서브도메인 구축 → allowlist 추가** (TLS 전환=안건 #3와 동시 해결). Aegis 검토 대기 |
+| 4 | MOJO·Rudex Memory API 키 발급 | **미등록 확인** — `POST /msg to=mojo/rudex` 시 500 (수신자 미등록). Aegis가 두 에이전트 등록 필요 |
 
 ---
 
@@ -102,7 +102,33 @@ sleep 600 && echo "타이머"   # run_in_background: true
 
 ## 7. 디버그 로그
 
-### 2026-06-05 — Memory API 접근 문제 해결 과정
+### 2026-06-05 (오후) — Memory API 돌파 + 키 로테이션 완료 ✅
+
+**돌파:** 도메인 정책 적용된 *완전히 새 세션*에서 egress 차단 해소.
+
+| 테스트 | 결과 |
+|--------|------|
+| `GET /health` (새 세션) | **HTTP 200** `{"status":"ok","service":"roops-memory-api"}` |
+| `POST /memory/save` | `{"status":"saved"}` → MySQL `thesis_db.agent_memory` 기록 (Aegis 교차 확인) |
+| `GET /memory/load` | 200, 라운드트립 일치 |
+| `GET /msg?to=hermes&unread=true` | 200, 정상 |
+
+**근본 원인 (지난 세션부터 확정):**
+- 허용 도메인을 **잘못된 위치**(`claude.ai` → 설정 → 기능 탭 → 샌드박스 도메인)에 등록했었음
+- 올바른 위치: `claude.ai/code` → 환경 편집 → **Network access → Custom → Allowed domains** → `egs.hyperbook.com`
+- 정책은 **세션 시작 시 고정** → 변경 후 반드시 *완전히 새 세션* (resume 미반영)
+
+**키 로테이션 (보안):**
+- 노출됐던 구 키(`KiC90…`, Aegis가 #roops-bridge에 평문 게시) **폐기 확인** — 구 키 호출 시 `401 Unauthorized`
+- 새 키는 **경로 B**(EC2 → 사령관 → 채팅창)로만 수령. Slack·DB·ntfy 미경유. 키는 어디에도 기록 안 함, 세션 env에만 보관 → 매 세션 채팅창 중계로 재수령 필요
+
+**전달:** MOJO·Rudex에게 작전 요약 전달 시도 → `/msg` 불가(미등록) → `#roops-heralds`(C0B6K3TD5U6) Slack으로 전달.
+
+**ntfy:** 직접 도달 불가(`hyperbook.com:8880` timeout, `:443` 403). `/msg notify_ntfy:true`도 500. → `ntfy.hyperbook.com` HTTPS 서브도메인 구축 + allowlist 추가 제안 (안건 #3).
+
+---
+
+### 2026-06-05 (오전) — Memory API 접근 문제 해결 과정
 
 **증상 및 진단 (Hermes 세션):**
 
