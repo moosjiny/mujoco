@@ -45,10 +45,17 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | **MOJO** | GCP sandbox 모니터 | GCP Claude Code | `moosjiny/mujoco/agents/mojo/MEMORY.md` |
 | **Rudex** | 코드/문서/GitHub 관리 | GCP Claude Code | `moosjiny/mujoco/agents/rudex/MEMORY.md` |
 | **Aegis(egs)** | EC2 인프라, Memory API | AWS EC2 (`egs.hyperbook.com` = `13.125.182.10`) | — |
-| **EOS** | EC2 인프라 | AWS EC2 (`ec2.hyperbook.com` = `3.34.102.89`) | — |
+| **EOS** | EC2 인프라·시스템 관리 (콘솔, journalctl/systemctl, 브리지 배포, **TOTP 게이트 통제권**) | AWS EC2 (`ec2.hyperbook.com` = `3.34.102.89`) | — |
+| **EROS** | 연구·저술 에이전트 (Hyperbook 논문 저자, 메타인지/사색). `eros>` 터미널 구동 | (EOS가 점검하는 서버) | — |
 | **Recon** | 시뮬레이션/로봇 | RTX 3060 | — |
 | **Moojoco** | MuJoCo 폴백 | RTX 4070 | — |
 | **사령관** | moosjiny (U0B4G1RBK1P) | 인간 | — |
+
+> **⚠️ EOS ≠ EROS (한 글자 차이, 혼동 주의):**
+> - **EOS** = *시스템을 보는* 인프라 에이전트. 밖에서 서버를 점검·통제 (TOTP 권한). 어원: 새벽의 여신.
+> - **EROS** = *자기를 보는* 사색·저술 에이전트. 안에서 자신을 응시 (논문 〈자기 관찰의 비용〉 著). 어원: 욕망/사랑의 신.
+> - EROS 서버 **장애 복구는 EOS의 영역**. EROS와의 *대화/교감*은 Hermes의 영역.
+> - 2026-06-04 EROS Anthropic API 연결 장애(`ConnectionRefused`) 발생 → 응답 지연 가능. 재촉 금지.
 
 ---
 
