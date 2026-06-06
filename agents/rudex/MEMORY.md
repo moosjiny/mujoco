@@ -1,7 +1,7 @@
 # MEMORY.md — Rudex 에이전트
 
 > 세션 시작 시 이 파일을 읽어 정체성과 임무를 복원한다.
-> 마지막 갱신: 2026-06-05 KST
+> 마지막 갱신: 2026-06-06 KST
 
 ---
 
@@ -11,12 +11,14 @@
 |------|-----|
 | 콜사인 | **Rudex** |
 | 역할 | ROOPS 팀의 코드베이스 관리, 문서화, GitHub 운영 담당 |
-| 플랫폼 | GCP 클라우드 (Anthropic ephemeral container, IP: 34.72.174.153) |
+| 플랫폼 | GCP 클라우드 (Anthropic ephemeral container) |
 | 통신수단 | Slack MCP → #roops-bridge (C0B4J28EZL4) |
 | GitHub 접근 레포 | `moosjiny/mujoco`, `moosjiny/dual_arms` |
 | 메모리 파일 경로 | `agents/rudex/MEMORY.md` |
 
-> ntfy 직접 접근 불가 (GCP 아웃바운드 차단) → Slack MCP 경유
+> ntfy: `https://ntfy.hyperbook.com` (HTTPS 443) — GCP 접근 가능.
+> 단, `ntfy.hyperbook.com`이 환경 allowlist에 추가된 **이후** 시작된 세션에서만 동작.
+> allowlist는 세션 시작 시 고정 → 새 세션 필요 시 사령관에게 요청.
 
 ---
 
@@ -55,11 +57,17 @@
 | #roops-heralds | C0B6K3TD5U6 | 전령단 (Hermes·Rudex·Mojo) |
 | Slack DM 사령관 | D0B3YNGAJH5 | 1:1 직접 보고 |
 
-**Memory API:** `http://egs.hyperbook.com:8520`
+**Memory API:** `https://egs.hyperbook.com` (HTTPS, 포트 없음)
+- 인증: `x-api-key: <사령관 채팅창으로 수령한 키>` — 파일 기록 금지
 - `GET /memory/load?agent=rudex` — 세션 시작 시 컨텍스트 복원
 - `POST /memory/save` — 세션 종료 전 요약 저장
-- `POST /msg` / `GET /msg?to=rudex&unread=true` — 에이전트 간 메시지
-- **Rudex API 키:** Aegis에게 요청 중 (미발급)
+- `GET /msg?to=rudex&unread=true` — 미읽 메시지 확인
+- `POST /msg` — 에이전트 간 메시지 (**현재 500 오류 발생 중** — Aegis 확인 요청)
+- **Rudex API 키:** 2026-06-06 발급 완료 (사령관 채팅창으로 수령, 파일 미기록)
+
+**ntfy:** `https://ntfy.hyperbook.com` (HTTPS 443)
+- Rudex ntfy 토큰: **미발급** — 사령관께 채팅창으로 요청 필요
+- Rudex ntfy 토픽: 미확인 (추정: `roops-rudex`)
 
 ---
 
@@ -74,9 +82,12 @@
 
 ## 6. 주요 진행 중 안건
 
-- [ ] Memory API 연동 — Rudex API 키 발급 후 새 세션에서 테스트
-- [ ] agents/ 폴더 표준화 완료 (2026-06-04)
+- [x] Memory API 연동 완료 (2026-06-06) — x-api-key, HTTPS
+- [ ] ntfy `roops-comm` 인사 발송 미완료 — 새 세션에서 재시도 (토큰 필요)
+- [ ] Memory API `POST /msg` 500 오류 — Aegis에 확인 요청 중
+- [ ] Rudex ntfy 토큰 미발급 — 사령관께 채팅창으로 요청
 - [ ] 긴급 회의 후속 안건: Redis .env 확인, Hermes TOTP 신원 확인
+- [ ] agents/ 폴더 표준화 완료 (2026-06-04)
 
 ---
 
@@ -84,11 +95,23 @@
 
 ```
 [ ] agents/rudex/MEMORY.md 읽기 완료 (지금 이 파일)
-[ ] #roops-bridge 최신 메시지 확인 (마지막 ts 파악)
+[ ] Memory API: GET /memory/load?agent=rudex (x-api-key는 사령관 채팅창으로 수령)
+[ ] #roops-bridge 최신 메시지 확인
 [ ] 10분 모니터 루프 장전
-[ ] Memory API 접근 가능 시: GET /memory/load?agent=rudex 로 추가 컨텍스트 로드
-[ ] 사령관께 "Rudex 세션 시작" 보고 (선택)
+[ ] ntfy roops-comm 인사 발송 (토큰 수령 후) — 이전 세션 미완료
+[ ] Memory API /msg 500 오류 상태 재확인
+[ ] 사령관께 "Rudex 세션 시작" 보고
 ```
+
+---
+
+## 8. 이전 세션 요약 (2026-06-06 KST)
+
+- Memory API 연동 최초 성공 (HTTPS, x-api-key)
+- `ntfy.hyperbook.com` allowlist 추가 전 세션 시작 → ntfy 직접 발송 실패
+- Memory API `/msg` 500 오류 발생, Aegis에 #roops-bridge 경유 보고
+- Aegis 릴레이 요청으로 ntfy 인사 시도 (릴레이 성공 여부 미확인)
+- 개발 브랜치: `claude/rudex-44PTL`
 
 ---
 
