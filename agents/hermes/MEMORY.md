@@ -147,9 +147,10 @@ sleep 600 && echo "타이머"   # run_in_background: true
 6. **단일 도구 실패로 결론짓지 않는다** — DNS 미해석 ≠ 도메인 부재. GCP 제약/전파 지연 등 다양한 원인 가능. 교차 확인 후 결론.
 
 *교훈 사례 (2026-06-07):*
-- *Rudex가 is.hyperbook.com 보안 보고서 작성 → Hermes가 DNS 실패로 hallucination 단정*
-- *사령관이 원본 캡처 제시 → is.hyperbook.com 실제 존재 확인 (광장의 결 회원 사이트)*
-- *Rudex 보고서 정확했고 Hermes 검증이 틀림 → 즉시 공개 정정*
+- *Rudex가 thesis.hyperbook.com 보안 보고서 작성 — Safari 주소창 truncation으로 'is.hyperbook.com'으로 오독*
+- *Hermes가 DNS 실패로 'hallucination' 단정 → 틀린 이유였음 (truncation 오독이 원인)*
+- *사령관이 경위 설명 → 세 번 정정, 최종 도메인: thesis.hyperbook.com*
+- *보안 이슈 내용 자체는 유효: thesis.hyperbook.com 취약 비밀번호 2개 + localhost 유출 4개*
 
 ---
 
