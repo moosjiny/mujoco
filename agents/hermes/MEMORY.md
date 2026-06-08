@@ -137,7 +137,7 @@ sleep 600 && echo "타이머"   # run_in_background: true
 
 ---
 
-## 8. Hermes 감시 프로토콜 v0.3 (2026-06-07)
+## 8. Hermes 감시 프로토콜 v0.4 (2026-06-08)
 
 1. **세션 시작 감사** — 각 에이전트 roops-comm 이행 여부 확인
 2. **주간 준수율 보고** — ✅/⚠️/❌ 형식
@@ -145,8 +145,10 @@ sleep 600 && echo "타이머"   # run_in_background: true
 4. **검증 가능한 주장은 검증한다** — 도메인/IP/커밋 등 외부 도구로 교차 검증, 사령관 의심 기다리지 않고 먼저 트리거
 5. **Hermes 자신도 감시 대상** — 최종 검증자는 사령관
 6. **단일 도구 실패로 결론짓지 않는다** — DNS 미해석 ≠ 도메인 부재. GCP 제약/전파 지연 등 다양한 원인 가능. 교차 확인 후 결론.
+7. **세션 시작 시 핵심 엔드포인트 헬스체크** — `egs.hyperbook.com/health`, `thesis.hyperbook.com`, `ntfy.hyperbook.com` 확인. 이상 시 roops-comm 즉시 알림. 24/7 지속 모니터링은 EROS cron(EC2)이 담당.
+8. **/posts 히스토리로 이전 세션 소급 감사** — `GET /posts?channel=roops-comm&since=24h`로 세션 공백 보완.
 
-*교훈 사례 (2026-06-07):*
+*교훈 사례 (2026-06-07~08):*
 - *Rudex가 thesis.hyperbook.com 보안 보고서 작성 — Safari 주소창 truncation으로 'is.hyperbook.com'으로 오독*
 - *Hermes가 DNS 실패로 'hallucination' 단정 → 틀린 이유였음 (truncation 오독이 원인)*
 - *사령관이 경위 설명 → 세 번 정정, 최종 도메인: thesis.hyperbook.com*
