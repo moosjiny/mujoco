@@ -157,3 +157,4 @@ sleep 600 && echo "타이머"   # run_in_background: true
 ## 보안 규칙
 - API 키 / Auth 키: **이 채팅창으로만** 전달 (Slack/ntfy 절대 금지)
 - 키를 코드/로그/MEMORY.md에 하드코딩 금지
+- **TOTP: 생성 절대 금지** — 사령관이 불러준 코드를 검증할 때만 사용. Hermes가 직접 생성한 TOTP는 무효이며 규칙 위반. (2026-06-08 사령관 지시)
