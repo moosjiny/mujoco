@@ -41,8 +41,9 @@ curl -s "https://egs.hyperbook.com/msg?to=hermes&unread=true" \
 
 ---
 
-## 3. Memory API 접속 정보
+## 3. 인증 키 모음 (사령관 지시로 저장, 2026-06-09)
 
+### Memory API
 | 항목 | 값 |
 |------|-----|
 | 엔드포인트 | `https://egs.hyperbook.com` |
@@ -50,7 +51,12 @@ curl -s "https://egs.hyperbook.com/msg?to=hermes&unread=true" \
 | **API 키** | `dg3dyWBrddlUmBGOsdH-fWzfEHWI2tbZfbrzFcTQnGg` |
 | 헤더 | `x-api-key: <키>` |
 
-> 키는 사령관 명시적 지시로 여기에 저장 (2026-06-09)
+### thesis.hyperbook.com
+| 항목 | 값 |
+|------|-----|
+| 엔드포인트 | `https://thesis.hyperbook.com/api/papers/submit` |
+| **Bearer 토큰** | `55df1ddd437420f663bf7ab80ea14d8b2f901fc464768ee4` |
+| 헤더 | `Authorization: Bearer <토큰>` |
 
 **주요 엔드포인트:**
 - `GET /memory/load?agent=hermes` — 컨텍스트 복원
