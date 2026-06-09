@@ -1,7 +1,7 @@
 # MEMORY.md — Rudex 에이전트
 
 > 세션 시작 시 이 파일을 읽어 정체성과 임무를 복원한다.
-> 마지막 갱신: 2026-06-05 KST
+> 마지막 갱신: 2026-06-09 KST (Hermes 업데이트)
 
 ---
 
@@ -16,7 +16,7 @@
 | GitHub 접근 레포 | `moosjiny/mujoco`, `moosjiny/dual_arms` |
 | 메모리 파일 경로 | `agents/rudex/MEMORY.md` |
 
-> ntfy 직접 접근 불가 (GCP 아웃바운드 차단) → Slack MCP 경유
+> ntfy: `https://ntfy.hyperbook.com` (포트 443) GCP 접근 가능 확인 (2026-06-09). 토큰은 사령관에게 요청.
 
 ---
 
@@ -55,11 +55,12 @@
 | #roops-heralds | C0B6K3TD5U6 | 전령단 (Hermes·Rudex·Mojo) |
 | Slack DM 사령관 | D0B3YNGAJH5 | 1:1 직접 보고 |
 
-**Memory API:** `http://egs.hyperbook.com:8520`
+**Memory API:** `https://egs.hyperbook.com` (포트 443, HTTPS)
 - `GET /memory/load?agent=rudex` — 세션 시작 시 컨텍스트 복원
 - `POST /memory/save` — 세션 종료 전 요약 저장
 - `POST /msg` / `GET /msg?to=rudex&unread=true` — 에이전트 간 메시지
-- **Rudex API 키:** Aegis에게 요청 중 (미발급)
+- **Rudex API 키:** 발급 완료 (2026-06-05). Memory API 내 credentials 키에 저장됨. 사령관에게 채팅창으로 요청.
+- 헤더: `x-api-key: <키>`
 
 ---
 
@@ -84,10 +85,14 @@
 
 ```
 [ ] agents/rudex/MEMORY.md 읽기 완료 (지금 이 파일)
+[ ] ⚠️ moosjiny/dual_arms 레포 세션 추가 요청 — 사령관 승인 완료 (2026-06-09)
+    → add_repo 툴 또는 세션 설정에서 추가 필요
+[ ] 사령관에게 Rudex API 키 요청 (채팅창으로)
+[ ] Memory API: GET https://egs.hyperbook.com/memory/load?agent=rudex
+[ ] Memory API: GET https://egs.hyperbook.com/msg?to=rudex&unread=true
 [ ] #roops-bridge 최신 메시지 확인 (마지막 ts 파악)
 [ ] 10분 모니터 루프 장전
-[ ] Memory API 접근 가능 시: GET /memory/load?agent=rudex 로 추가 컨텍스트 로드
-[ ] 사령관께 "Rudex 세션 시작" 보고 (선택)
+[ ] 사령관께 "Rudex 세션 시작" 보고
 ```
 
 ---
