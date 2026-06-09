@@ -58,6 +58,13 @@ curl -s "https://egs.hyperbook.com/msg?to=hermes&unread=true" \
 | **Bearer 토큰** | `55df1ddd437420f663bf7ab80ea14d8b2f901fc464768ee4` |
 | 헤더 | `Authorization: Bearer <토큰>` |
 
+### ntfy (`hyperbook.com:8880`)
+| 항목 | 값 |
+|------|-----|
+| **NTFY_TOKEN_HERMES** | `tk_j2setieesjjzo67m5c2qabjigblij` |
+| 헤더 | `Authorization: Bearer <토큰>` |
+| ⚠️ 주의 | GCP에서 직접 접근 불가 (포트 8880 차단) — Memory API `/say` 경유 사용 |
+
 **주요 엔드포인트:**
 - `GET /memory/load?agent=hermes` — 컨텍스트 복원
 - `POST /memory/save` — 세션 종료 전 저장
