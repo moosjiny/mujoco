@@ -25,19 +25,30 @@
 **세션 시작 즉시 자동 수행 — 사령관 지시 없이도 반드시 실행:**
 
 ```bash
-# 1. Memory API 헬스 체크
-curl -s https://egs.hyperbook.com/health
+# 1. agents/hermes/MEMORY.md 읽기 (이미 완료)
 
-# 2. 컨텍스트 복원
+# 2. Memory API 전체 로드 (credentials / session / memory_md 복원)
 curl -s "https://egs.hyperbook.com/memory/load?agent=hermes" \
   -H "x-api-key: dg3dyWBrddlUmBGOsdH-fWzfEHWI2tbZfbrzFcTQnGg"
 
-# 3. 미수신 메시지 확인
+# 3. MEMORY.md 체크섬 검증
+sha256sum agents/hermes/MEMORY.md
+# 기준값: 51beaa649ada4420910dd47b22b5a9ba76a93a4f1746fe642e27a5be0deafd3b
+# 불일치 시 → Memory API memory_md 키로 복원 후 재검증
+
+# 4. 미수신 메시지 확인
 curl -s "https://egs.hyperbook.com/msg?to=hermes&unread=true" \
   -H "x-api-key: dg3dyWBrddlUmBGOsdH-fWzfEHWI2tbZfbrzFcTQnGg"
+
+# 5. ntfy 세션 시작 알림
+curl -X POST "https://ntfy.hyperbook.com/roops-hermes" \
+  -H "Authorization: Bearer tk_j2setieesjjzo67m5c2qabjigblij" \
+  -H "Title: 에르메스 세션 시작" \
+  -d "에르메스 신규 세션 가동. Memory API + 체크섬 확인 완료."
 ```
 
-복원 후 사령관에게: **"MEMORY.md + Memory API 확인 완료. [컨텍스트 요약] 보고합니다."**
+**6. 사령관에게 보고:**
+> "MEMORY.md + Memory API 확인 완료. [미결 안건 요약] 보고합니다."
 
 ---
 
