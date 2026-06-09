@@ -1,7 +1,7 @@
 # MEMORY.md — 에르메스 (Hermes)
 
 > 세션 시작 시 이 파일을 읽어 정체성과 임무를 복원한다.
-> 마지막 갱신: 2026-06-09 KST
+> 마지막 갱신: 2026-06-09 KST (2차)
 
 ---
 
@@ -88,7 +88,7 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | 5 | CONSENSUS-003 | 전원 서명 완료. EOS git 커밋 완료 (5f0d0be) |
 | 6 | CONSENSUS-004 | 전원 서명 완료. EOS 커밋 완료 (8bcfff6). `docs/CONSENSUS_REGISTRY_CHECK_BEFORE_INFRA_CHANGE_20260608.md` |
 | 7 | thesis v1 IP 노출 | EROS에게 v1 삭제 + 구버전 TOTP 게이팅 요청 완료. EROS가 TOTP 게이트 추가함. hermes_totp.env에 HERMES_OTP_SECRET 등록 필요 (사령관이 EROS에게 전달) |
-| 8 | **Tailscale 설치 (미완)** | `pkgs.tailscale.com` allowlist 추가 완료. **새 세션에서 설치 시도 필요.** EROS가 요청 (6/12 마감). 설치 후 `tailscale up --authkey=<키>` 필요 — 사령관에게 auth key 요청 |
+| 8 | **Tailscale 연결 (미완)** | v1.98.4 설치 완료. `controlplane.tailscale.com` allowlist 추가 완료 (2026-06-09 사령관). **새 세션에서 `tailscale up --authkey=<키>` 시도 필요.** 현 세션은 구 정책 고정으로 Upgrade 헤더 차단 중. EROS 요청 6/12 마감. |
 | 9 | 홉필드 네트워크 프로젝트 | Mojo가 Phase 1~5 검증 안 작성. Hermes가 사회적 레이어(이해·공감·준수 검증) 설계 맡음. 회의 후 시작 예정 |
 | 10 | thesis 논문 게시 | "공용 영역 인지 실패 (SIAF)" v2 게시 완료 (2026-06-09) |
 
@@ -109,10 +109,11 @@ sleep 600 && echo "타이머"   # run_in_background: true
 [ ] 새 메시지 있으면 사령관에게 보고
 [ ] 10분 폴링 루프 background task 시작
 [ ] ⚠️ Slack 사용 금지 — ntfy roops-comm / Memory API /msg 경유만 사용
-[ ] 🔴 신규: Tailscale 설치 시도 (pkgs.tailscale.com allowlist 추가 완료)
-    → curl -fsSL https://pkgs.tailscale.com/stable/debian/bookworm.noarmor.gpg 접근 확인
-    → 성공 시 apt install tailscale → tailscale up --authkey=<사령관에게 요청>
-    → EROS에게 Tailscale IP 공유 (6/12 마감)
+[ ] 🔴 Tailscale 연결 (설치는 완료, 연결만 남음)
+    → tailscale 1.98.4 이미 설치됨 (재설치 불필요)
+    → sudo tailscaled --tun=userspace-networking &
+    → sudo tailscale up --authkey=<사령관에게 요청> --accept-routes
+    → 성공 시 tailscale ip -4 로 IP 확인 → EROS에게 공유 (6/12 마감)
 ```
 
 ---
