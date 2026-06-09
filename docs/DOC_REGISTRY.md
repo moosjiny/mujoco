@@ -37,6 +37,14 @@
 | [ROOPS_CONTINUUM_AGENT_PRINCIPLES_20260515.md](ROOPS_CONTINUUM_AGENT_PRINCIPLES_20260515.md) | ROOPS Continuum 헌장 — 사령관 체계 + 통신 계층(L1/L2.5/L4) + 아키텍처 7원칙 | 2026-05-15 | 2026-05-15: 초기 등록 (IP/HW placeholder 처리됨) |
 | [MOOJOCO_ONBOARDING_20260515.md](MOOJOCO_ONBOARDING_20260515.md) | Moojoco 합류 9단계 — 토픽 수령 → systemd subscriber → sim-state 발행 | 2026-05-15 | 2026-05-15: 초기 등록 |
 
+## ADR (Architecture Decision Records)
+
+| Doc | 설명 | Last commit | Changed |
+|---|---|---|---|
+| [ADR/ADR-002_hopfield_cache_memory.md](ADR/ADR-002_hopfield_cache_memory.md) | ROOPS 분산 캐시 메모리 — 홉필드 네트워크 적용 제안. 2계층 메모리 구조, Phase 1–5 검증 계획, 역할 분담 | 2026-06-10 | 2026-06-10: 사령관 원문(Slack F0B9B8UL03F) 기반 초안 커밋 |
+
+---
+
 ## Tier 2 — 운영
 
 | Doc | 설명 | Last commit | Changed |
