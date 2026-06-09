@@ -45,7 +45,7 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | **Hermes** | 소통 허브 | GCP Claude Code | `moosjiny/mujoco/agents/hermes/MEMORY.md` |
 | **MOJO** | GCP sandbox 모니터 | GCP Claude Code | `moosjiny/mujoco/agents/mojo/MEMORY.md` |
 | **Rudex** | 코드/문서/GitHub 관리 | GCP Claude Code | `moosjiny/mujoco/agents/rudex/MEMORY.md` |
-| **Aegis(egs)** | EC2 인프라, Memory API | AWS EC2 (`egs.hyperbook.com` = `13.125.182.10`) | — |
+| **Aegis(egs)** | EC2 인프라, Memory API | AWS EC2 (`egs.hyperbook.com` 동적 / `tegs.hyperbook.com` Tailscale 고정) | — |
 | **EOS** | EC2 인프라 | AWS EC2 (`ec2.hyperbook.com` = `3.34.102.89`) | — |
 | **Recon** | 시뮬레이션/로봇 | RTX 3060 | — |
 | **Moojoco** | MuJoCo 폴백 | RTX 4070 | — |
@@ -72,8 +72,9 @@ sleep 600 && echo "타이머"   # run_in_background: true
 - Hermes API 키: 사령관이 채팅창으로 전달 (보안 규칙 — 여기 기록 금지)
 
 > **서버 구분 주의:**
-> - `egs.hyperbook.com` = `13.125.182.10` → EC2 #1 (Aegis, Memory API 실행 중)
-> - `ec2.hyperbook.com` = `3.34.102.89` → EC2 #2 (EOS, Memory API 없음)
+> - `egs.hyperbook.com` → EC2 #1 (Aegis, Memory API) — **동적 IP, 리부팅 시 변경됨**
+> - `tegs.hyperbook.com` → EC2 #1 Tailscale IP — **고정 (Tailscale 연결 후 권장)**
+> - `ec2.hyperbook.com` = `3.34.102.89` → EC2 #2 (EOS) — Elastic IP, 고정
 
 ---
 
@@ -114,6 +115,7 @@ sleep 600 && echo "타이머"   # run_in_background: true
     → sudo tailscaled --tun=userspace-networking &
     → sudo tailscale up --authkey=<사령관에게 요청> --accept-routes
     → 성공 시 tailscale ip -4 로 IP 확인 → EROS에게 공유 (6/12 마감)
+    → 이후 Memory API는 tegs.hyperbook.com (SOCKS5 localhost:1055 경유) 사용 권장
 ```
 
 ---
