@@ -1,7 +1,7 @@
 # MEMORY.md — 에르메스 (Hermes)
 
 > 세션 시작 시 이 파일을 읽어 정체성과 임무를 복원한다.
-> 마지막 갱신: 2026-06-07 KST
+> 마지막 갱신: 2026-06-09 KST
 
 ---
 
@@ -81,13 +81,16 @@ sleep 600 && echo "타이머"   # run_in_background: true
 
 | # | 안건 | 상태 |
 |---|------|------|
-| 1 | Memory API 연동 | HTTPS 전환 완료. 새 세션 접근 정상 확인 (2026-06-07) |
-| 2 | 에이전트 메모리 파일 표준화 | `agents/` 폴더 구조로 완료 |
-| 3 | ntfy 인증 개선 | 에이전트별 개별 토큰 권고, 사령관 결정 대기 |
-| 4 | Rudex Memory API 키 발급 | Aegis 발급 완료 (2026-06-05), Rudex에 전달 필요 |
-| 5 | Rudex 보안 보고서 정정 | is.hyperbook.com hallucination 확인 (DNS 없음) — 도메인명 정정 필요 |
-| 6 | 보안 인시던트 대책 회의 | EOS 소집, Aegis 보고서 대기 중 |
-| 7 | 감시 프로토콜 v0.2 | roops-comm 게시 완료 (2026-06-07) |
+| 1 | Memory API 연동 | 정상 운영 중 |
+| 2 | 에이전트 메모리 파일 표준화 | 완료 |
+| 3 | ntfy 인증 개선 | Hermes 전용 토큰 발급 완료 (2026-06-08) |
+| 4 | CONSENSUS-001 | 전원 서명 완료. EOS 대표 커밋 완료 |
+| 5 | CONSENSUS-003 | 전원 서명 완료. EOS git 커밋 완료 (5f0d0be) |
+| 6 | CONSENSUS-004 | 전원 서명 완료. EOS 커밋 완료 (8bcfff6). `docs/CONSENSUS_REGISTRY_CHECK_BEFORE_INFRA_CHANGE_20260608.md` |
+| 7 | thesis v1 IP 노출 | EROS에게 v1 삭제 + 구버전 TOTP 게이팅 요청 완료. EROS가 TOTP 게이트 추가함. hermes_totp.env에 HERMES_OTP_SECRET 등록 필요 (사령관이 EROS에게 전달) |
+| 8 | **Tailscale 설치 (미완)** | `pkgs.tailscale.com` allowlist 추가 완료. **새 세션에서 설치 시도 필요.** EROS가 요청 (6/12 마감). 설치 후 `tailscale up --authkey=<키>` 필요 — 사령관에게 auth key 요청 |
+| 9 | 홉필드 네트워크 프로젝트 | Mojo가 Phase 1~5 검증 안 작성. Hermes가 사회적 레이어(이해·공감·준수 검증) 설계 맡음. 회의 후 시작 예정 |
+| 10 | thesis 논문 게시 | "공용 영역 인지 실패 (SIAF)" v2 게시 완료 (2026-06-09) |
 
 ---
 
@@ -95,13 +98,21 @@ sleep 600 && echo "타이머"   # run_in_background: true
 
 ```
 [ ] agents/hermes/MEMORY.md 읽기 완료 (지금 이 파일)
-[ ] 사령관에게 Hermes API 키 요청 (채팅창으로)
+[ ] 사령관에게 다음 키 요청 (채팅창으로):
+    - Hermes Memory API 키
+    - Hermes ntfy 토큰
+    - Hermes thesis 제출 토큰
 [ ] GET https://egs.hyperbook.com/health → 200 확인
 [ ] GET https://egs.hyperbook.com/memory/load?agent=hermes → 컨텍스트 복원
 [ ] GET https://egs.hyperbook.com/msg?to=hermes&unread=true → 미수신 메시지 확인
+[ ] GET https://ntfy.hyperbook.com/roops-comm/json?poll=1&since=1h → 최신 팀 상황 확인
 [ ] 새 메시지 있으면 사령관에게 보고
 [ ] 10분 폴링 루프 background task 시작
-[ ] ⚠️ Slack 사용 금지 — Memory API /msg 경유만 사용
+[ ] ⚠️ Slack 사용 금지 — ntfy roops-comm / Memory API /msg 경유만 사용
+[ ] 🔴 신규: Tailscale 설치 시도 (pkgs.tailscale.com allowlist 추가 완료)
+    → curl -fsSL https://pkgs.tailscale.com/stable/debian/bookworm.noarmor.gpg 접근 확인
+    → 성공 시 apt install tailscale → tailscale up --authkey=<사령관에게 요청>
+    → EROS에게 Tailscale IP 공유 (6/12 마감)
 ```
 
 ---
