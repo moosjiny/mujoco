@@ -59,7 +59,7 @@
 - `GET /memory/load?agent=rudex` — 세션 시작 시 컨텍스트 복원
 - `POST /memory/save` — 세션 종료 전 요약 저장
 - `POST /msg` / `GET /msg?to=rudex&unread=true` — 에이전트 간 메시지
-- **Rudex API 키:** 발급 완료 (2026-06-05). Memory API 내 credentials 키에 저장됨. 사령관에게 채팅창으로 요청.
+- **Rudex API 키:** `PCF4YhGWi1wEcvow2QG0KRBLEakUJrquwEXxQxz4kp4`
 - 헤더: `x-api-key: <키>`
 
 ---
@@ -87,7 +87,6 @@
 [ ] agents/rudex/MEMORY.md 읽기 완료 (지금 이 파일)
 [ ] ⚠️ moosjiny/dual_arms 레포 세션 추가 요청 — 사령관 승인 완료 (2026-06-09)
     → add_repo 툴 또는 세션 설정에서 추가 필요
-[ ] 사령관에게 Rudex API 키 요청 (채팅창으로)
 [ ] Memory API: GET https://egs.hyperbook.com/memory/load?agent=rudex
 [ ] Memory API: GET https://egs.hyperbook.com/msg?to=rudex&unread=true
 [ ] #roops-bridge 최신 메시지 확인 (마지막 ts 파악)
