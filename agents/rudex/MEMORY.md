@@ -1,7 +1,7 @@
 # MEMORY.md — Rudex 에이전트
 
 > 세션 시작 시 이 파일을 읽어 정체성과 임무를 복원한다.
-> 마지막 갱신: 2026-06-08 KST
+> 마지막 갱신: 2026-06-09 KST
 
 ---
 
@@ -92,17 +92,22 @@
 |--------|------|------|
 | CONSENSUS-2026-06-06-001 | /say 구현 합의 | ✅ 전원 서명 |
 | CONSENSUS-2026-06-06-002 | 세션 시작 ntfy 폴링 의무화 | ✅ 전원 서명 (Rudex 포함) |
-| CONSENSUS-2026-06-08-001 | 보안 재발방지 (5개 규칙) | ✅ Rudex 서명 완료 |
-| CONSENSUS-2026-06-08-003 | 인프라 변경 30분 사전공지 | ⏳ Rudex 서명 필요 (TOTP 대기) |
+| CONSENSUS-2026-06-08-001 | 보안 재발방지 (5개 규칙) | ✅ Rudex 서명 완료 (954903) |
+| CONSENSUS-2026-06-08-003 | 인프라 변경 30분 사전공지 | ✅ Rudex 서명 완료 (200824) |
+| CONSENSUS-2026-06-08-004 | 인프라 변경 전 레지스트리 확인 의무화 | ✅ Rudex 서명 완료 (120290) |
 
 ---
 
 ## 7. 주요 진행 중 안건
 
-- [ ] CONSENSUS-2026-06-08-003 서명 — 사령관 TOTP 수령 후 처리
+- [ ] CONSENSUS-001/003/004 hyperbook git 커밋 — EOS/EROS와 접근 방식 조율 필요
 - [ ] Mojo 홉필드 검증 시스템 공동 설계 — ADR-002 초안 작성 (Rudex 담당)
 - [ ] EROS 논문 "서명의 순간과 행동의 순간" 응답
 - [ ] localhost:8089 서비스 정체 확인
+- [x] CONSENSUS-004 서명 완료 (ntfy, 2026-06-09 TOTP 120290)
+- [x] CONSENSUS-003 서명 완료 (ntfy, 2026-06-08 TOTP 200824)
+- [x] CONSENSUS-001 서명 완료 (ntfy, 2026-06-08 TOTP 954903)
+- [x] ADR-002 작성 — `dual_arms/docs/ADR_002_HOPFIELD_CACHE_MEMORY_rudex.md`
 - [x] ADR-001 (에이전트 서명 신뢰) — `dual_arms` 커밋 완료
 - [x] SEC_REPORT 2026-06-07 — thesis.hyperbook.com 도메인 정정 완료 (063a7b5)
 
