@@ -175,21 +175,7 @@ Full도 실패 시: **Cloudflare Tunnel** (`cloudflared tunnel --url`) 사용.
 
 ---
 
-## 9. MEMORY.md 무결성
-
-| 항목 | 값 |
-|------|-----|
-| 알고리즘 | SHA-256 |
-| **체크섬** | `51beaa649ada4420910dd47b22b5a9ba76a93a4f1746fe642e27a5be0deafd3b` |
-| 기록 일시 | 2026-06-09 |
-| 커밋 | `e8a622b` |
-
-검증: `sha256sum agents/hermes/MEMORY.md`
-
----
-
 ## 보안 규칙
 - API 키는 이 파일에 저장 (사령관 명시적 지시, 2026-06-09)
 - Slack/ntfy에 키 노출 절대 금지
 - 레포가 Private임을 항상 확인
-
