@@ -15,17 +15,22 @@ class Embedder:
     에이전트 컨텍스트를 고정 차원 벡터로 변환.
 
     우선순위:
-      1. sentence-transformers (paraphrase-multilingual-MiniLM-L12-v2, d=384)
-         한국어+영어 지원, 경량 (117MB)
+      1. sentence-transformers (all-mpnet-base-v2, d=768)
+         ADR-002 Aegis 확정 (2026-06-10, commit 63d7cc7)
+         홉필드 패턴 수용: ~106개 (0.138 × 768)
       2. 해시 기반 폴백 (모델 불필요, d=256, 의미 유사도 없음)
 
-    Phase 0 결정사항:
-      d=384로 확정 (multilingual-MiniLM).
-      저장 용량 상한: 2^(384/2) = 2^192 패턴 (사실상 무제한).
-      W 행렬 크기: n_patterns × 384 × 4 bytes.
+    Phase 0 결정사항 (ADR-002, Aegis 확정):
+      모델: all-mpnet-base-v2
+      d=768 확정.
+      W 행렬 크기: n_patterns × 768 × 4 bytes.
+
+    변경 이력:
+      2026-06-10: 384d(multilingual-MiniLM) → 768d(all-mpnet-base-v2)
+                  ADR-002 팀 합의 반영. EOS T2 테스트 56% → 70% 개선 목표.
     """
 
-    MODEL_NAME = "paraphrase-multilingual-MiniLM-L12-v2"
+    MODEL_NAME = "all-mpnet-base-v2"
     FALLBACK_DIM = 256
 
     def __init__(self, model_name: Optional[str] = None):
