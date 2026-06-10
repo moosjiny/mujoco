@@ -119,9 +119,11 @@ Mojo가 홉필드 네트워크를 활용한 분산 캐시 메모리 구조를 �
 ## 미결 사항
 
 - [x] ~~**데이터 시스템 선택**~~ — **확정: MySQL JSON + Python in-memory 코사인 유사도** (Aegis, 2026-06-10)
-- [x] ~~**임베딩 모델 선택**~~ — **확정: `all-mpnet-base-v2` (768d)** (Aegis commit `63d7cc7`, 사령관 승인 2026-06-10)
-  - Hopfield 패턴 수용: ~106개
-  - LAN-only 완전 동작 (sentence-transformers pip install → 오프라인)
+- [x] ~~**임베딩 모델 선택**~~ — **확정: `paraphrase-multilingual-MiniLM-L12-v2` (384d, 다국어)** (사령관 지시 2026-06-10, Aegis commit `c36b08d`)
+  - 이전: `BAAI/bge-small-en-v1.5` (영어 전용) → T2 정밀도 56% 미달 원인
+  - 이전 후보: `all-mpnet-base-v2` (768d, commit `63d7cc7`) — 한국어 지원 부재로 교체
+  - 현재 모델: 50+ 언어(한국어 포함), 차원 384d, CPU ~50ms/문장
+  - Hopfield 패턴 수용: ~53개 (0.138 × 384)
 - [ ] **W 행렬 직렬화 방식** — 세션 종료 시 외부 저장소 persist 미명시 (Phase 4 필수 조건)
   - 후보: numpy `.npy`, HDF5, MySQL JSON 컬럼
   - vector endpoint 구현 후 결정 예정
