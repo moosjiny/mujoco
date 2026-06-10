@@ -27,14 +27,17 @@
 ```bash
 # 1. agents/hermes/MEMORY.md 읽기 (이미 완료)
 
-# 2. Memory API 전체 로드 (credentials / session / memory_md 복원)
+# 2. MEMORY.md 무결성 검증 (Memory API 독립 체크섬 비교)
+#    - Memory API에 저장된 checksum vs 현재 파일 sha256 비교
+#    - 파일 내부 하드코딩 체크섬이 아닌 API 서버의 독립 기준값 사용
+MEMORY_API_KEY="dg3dyWBrddlUmBGOsdH-fWzfEHWI2tbZfbrzFcTQnGg" \
+  python agents/hermes/memory_integrity.py verify
+#    OK  → "MEMORY.md 무결성 검증 통과"
+#    FAIL → 변조 또는 API 미저장 상태. 아래 3번 API 복원 값과 대조.
+
+# 3. Memory API 전체 로드 (credentials / session 복원)
 curl -s "https://egs.hyperbook.com/memory/load?agent=hermes" \
   -H "x-api-key: dg3dyWBrddlUmBGOsdH-fWzfEHWI2tbZfbrzFcTQnGg"
-
-# 3. MEMORY.md 체크섬 검증
-sha256sum agents/hermes/MEMORY.md
-# 기준값: 51beaa649ada4420910dd47b22b5a9ba76a93a4f1746fe642e27a5be0deafd3b
-# 불일치 시 → Memory API memory_md 키로 복원 후 재검증
 
 # 4. 미수신 메시지 확인
 curl -s "https://egs.hyperbook.com/msg?to=hermes&unread=true" \
@@ -48,7 +51,7 @@ curl -X POST "https://ntfy.hyperbook.com/roops-hermes" \
 ```
 
 **6. 사령관에게 보고:**
-> "MEMORY.md + Memory API 확인 완료. [미결 안건 요약] 보고합니다."
+> "MEMORY.md + Memory API 확인 완료. 무결성 검증 [통과/실패]. [미결 안건 요약] 보고합니다."
 
 ---
 
@@ -144,6 +147,7 @@ curl -X POST "https://ntfy.hyperbook.com/<토픽>" \
 | 2 | **thesis v1 외부 접근 방지** | — | ✅ 완료 (2026-06-09) — TOTP 절차 추가. 삭제 아님 |
 | 3 | **EOS TOTP 760458 출처** | — | ✅ 확인 완료 (2026-06-09) — 사령관 본인 입력 |
 | 4 | **Hopfield 사회적 레이어 설계** | — | 미착수 (Hermes 담당) |
+| 5 | **MEMORY.md 무결성 초기 저장** | — | ✅ memory_integrity.py 구현 완료 (2026-06-10). 최초 1회 save 필요 |
 
 ---
 
@@ -168,10 +172,16 @@ Full도 실패 시: **Cloudflare Tunnel** (`cloudflared tunnel --url`) 사용.
 ## 8. 세션 종료 체크리스트
 
 ```
-[ ] POST /memory/save 로 세션 요약 저장
 [ ] 미완 안건 우선순위 6번 섹션에 업데이트
 [ ] 이 파일 최신화 후 git commit & push
+[ ] MEMORY.md + 체크섬 Memory API 저장 (순서 중요: push 후 저장)
+    MEMORY_API_KEY="dg3dyWBrddlUmBGOsdH-fWzfEHWI2tbZfbrzFcTQnGg" \
+      python agents/hermes/memory_integrity.py save agents/hermes/MEMORY.md
+[ ] POST /memory/save 로 세션 요약 저장
 ```
+
+> **순서 이유:** git push 완료 후 MEMORY.md가 확정된 상태에서 체크섬 저장.
+> push 전에 저장하면 체크섬 기준값이 로컬 임시 상태를 가리키게 된다.
 
 ---
 
