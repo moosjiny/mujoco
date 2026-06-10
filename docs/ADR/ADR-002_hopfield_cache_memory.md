@@ -1,9 +1,9 @@
 # ADR-002: ROOPS 분산 캐시 메모리 — 홉필드 네트워크
 
-**상태:** 초안 (검토 중)
+**상태:** 진행 중 (Phase 1 구현 착수)
 **작성:** Rudex (문서화) + Mojo (이론·검증 설계)
-**일자:** 2026-06-08 KST
-**관련 논의:** roops-comm 전체 회의 (2026-06-08)
+**일자:** 2026-06-08 KST | **최종 갱신:** 2026-06-10 KST
+**관련 논의:** roops-comm 전체 회의 (2026-06-08); EROS·EOS·Aegis 협의 (2026-06-10)
 
 ---
 
@@ -88,27 +88,57 @@ Mojo가 홉필드 네트워크를 활용한 분산 캐시 메모리 구조를 �
 |----------|------|
 | **Mojo** | 이론 검토, 자료 조사, 실험 설계, Phase 1–5 진행 |
 | **Rudex** | 문서화, ADR 작성, 실험 결과 기록, GitHub 관리 |
-| **EROS** | 철학적 검토, 논문 연계 |
-| **Aegis** | 데이터 시스템 선택 검토 |
+| **EROS** | WHY 검증 — 목적 부합 검증, 검증 계획(T1~T7), 논문 연계 |
+| **EOS** | WHAT 구현 — `rhms_client.py` (store/recall/bootstrap), 테스트 실행 |
+| **Aegis** | HOW 인프라 — Memory API vector 엔드포인트, 데이터 시스템 선택 |
+
+---
+
+## 구현 현황 (RHMS — ROOPS Hopfield Memory System)
+
+> ADR-002의 구현체가 RHMS로 명명됨 (2026-06-10 EOS·EROS·Aegis 협의).
+
+### Phase 1 구현 상태 (2026-06-10 기준)
+
+| 항목 | 상태 | 비고 |
+|------|------|------|
+| `rhms_client.py` (EOS) | 진행 중 | T1~T6 완료, T7 대기 |
+| vector 엔드포인트 (Aegis) | 진행 중 | POST /memory/vector, GET /memory/search |
+| T1 store() | ✅ PASS | 30패턴 저장 |
+| T2 recall 정밀도 | ⚠️ 56% (기준 70% 미달) | 모델 업그레이드 시 개선 예상 |
+| T3 Spurious Attractor | ✅ PASS | 오답률 20% |
+| T4 bootstrap 유용성 | ✅ PASS | 6줄 컨텍스트 출력 |
+| T5 SIAF 방지 | ✅ PASS | MySQL 의존성 패턴 top-1 (0.859) |
+| T6 세션 복원 속도 | ⚠️ 재검토 | 기준 재정의 필요 (bootstrap 91ms vs MEMORY.md 11ms) |
+| T7 회귀 (Aegis) | ⏳ 대기 | vector endpoint 구현 후 |
+
+**시각화 대시보드:** https://rhm.hyperbook.com/viz (실데이터 전환 완료)
 
 ---
 
 ## 미결 사항
 
-- [ ] **데이터 시스템 선택** — Aegis 검토 대기: Faiss·pgvector·그래프 DB·MySQL 확장 중 선택
-- [ ] **임베딩 모델 선택** — 에이전트 컨텍스트 임베딩에 어떤 모델 사용할 것인가
-- [ ] **저장 주기** — 실시간 vs 세션 종료 시 일괄 저장
-- [ ] **Phase 1 착수 시점** — Mojo 세션 스케줄 확인 필요
+- [x] ~~**데이터 시스템 선택**~~ — **확정: MySQL JSON + Python in-memory 코사인 유사도** (Aegis, 2026-06-10)
+- [x] ~~**임베딩 모델 선택**~~ — **확정: `all-mpnet-base-v2` (768d)** (Aegis commit `63d7cc7`, 사령관 승인 2026-06-10)
+  - Hopfield 패턴 수용: ~106개
+  - LAN-only 완전 동작 (sentence-transformers pip install → 오프라인)
+- [ ] **W 행렬 직렬화 방식** — 세션 종료 시 외부 저장소 persist 미명시 (Phase 4 필수 조건)
+  - 후보: numpy `.npy`, HDF5, MySQL JSON 컬럼
+  - vector endpoint 구현 후 결정 예정
+- [ ] **W 업데이트 주기** — 세션 종료 시 전체 저장 vs incremental 업데이트
+- [ ] **T2 정밀도 개선** — 56% → 70% 달성을 위한 모델 또는 데이터 전처리 개선
+- [ ] **T6 기준 재정의** — "bootstrap ≤ MEMORY.md 읽기 × 50%" → "bootstrap vs MEMORY.md 전체 컨텍스트 처리 시간"으로 변경 검토 (EOS 제안)
 
 ---
 
-## 결론 (초안)
+## 결론
 
-홉필드 네트워크 기반 분산 캐시 메모리는 ROOPS의 세션 단절 문제를 구조적으로 해결할 수 있는 유망한 방향이다. 특히 멀티에이전트 홉필드는 선행 연구가 없는 신규 영역으로, ROOPS 팀이 실질적인 첫 구현 사례가 될 수 있다.
+홉필드 네트워크 기반 분산 캐시 메모리(RHMS)는 ROOPS의 세션 단절 문제를 구조적으로 해결하는 구현 단계에 진입했다. 임베딩 모델(`all-mpnet-base-v2`, 768d)과 데이터 시스템(MySQL JSON)이 확정되어 Phase 1 검증이 진행 중이다.
 
-단, Phase 1부터 순차 검증이 필요하며, 데이터 시스템 선택(Aegis 검토)이 선행되어야 한다.
+W 행렬 persist 설계가 Phase 4(세션 단절 복원) 실현을 위한 핵심 미결 항목이다.
 
 ---
 
-*이론 설계 및 검증 계획: Mojo*
+*이론 설계 및 검증 계획: Mojo, EROS*
+*구현: EOS (`rhms_client.py`), Aegis (vector endpoint)*
 *문서화: Rudex*

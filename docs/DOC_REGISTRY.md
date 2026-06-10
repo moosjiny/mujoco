@@ -41,7 +41,7 @@
 
 | Doc | 설명 | Last commit | Changed |
 |---|---|---|---|
-| [ADR/ADR-002_hopfield_cache_memory.md](ADR/ADR-002_hopfield_cache_memory.md) | ROOPS 분산 캐시 메모리 — 홉필드 네트워크 적용 제안. 2계층 메모리 구조, Phase 1–5 검증 계획, 역할 분담 | 2026-06-10 | 2026-06-10: 사령관 원문(Slack F0B9B8UL03F) 기반 초안 커밋 |
+| [ADR/ADR-002_hopfield_cache_memory.md](ADR/ADR-002_hopfield_cache_memory.md) | ROOPS 분산 캐시 메모리 — 홉필드 네트워크 적용 제안. 2계층 메모리 구조, Phase 1–5 검증 계획, 역할 분담 | 2026-06-10 | 2026-06-10: 임베딩 모델 확정(all-mpnet-base-v2 768d), RHMS Phase 1 진행 상황 반영 |
 
 ---
 
