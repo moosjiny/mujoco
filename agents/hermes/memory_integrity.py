@@ -175,6 +175,40 @@ def _verify_from_local(api_error: str) -> dict:
     return {"ok": False, "reason": f"API 오류 + 로컬 폴백 없음: {api_error}"}
 
 
+def verify_local(memory_path: str, api_key: str) -> dict:
+    """
+    로컬 MEMORY.md 파일을 API에 저장된 체크섬 기준값과 비교.
+    세션 시작 시 로컬 파일 변조 여부 감지용.
+    """
+    try:
+        with open(memory_path, encoding="utf-8") as f:
+            local_content = f.read()
+    except FileNotFoundError:
+        return {"ok": False, "reason": f"로컬 파일 없음: {memory_path}"}
+
+    local_checksum = compute_checksum(local_content)
+
+    headers = {"x-api-key": api_key}
+    stored_checksum = _get_key(CHECKSUM_KEY, headers)
+
+    if stored_checksum is None:
+        return {
+            "ok": False,
+            "reason": "API에 체크섬 기준값 없음 — save 먼저 실행 필요",
+            "local_checksum": local_checksum,
+        }
+
+    if local_checksum != stored_checksum:
+        return {
+            "ok": False,
+            "reason": "⚠️ 로컬 파일 변조 감지: 로컬 sha256 ≠ API 기준값",
+            "local_checksum": local_checksum,
+            "api_checksum": stored_checksum,
+        }
+
+    return {"ok": True, "checksum": local_checksum, "path": memory_path}
+
+
 if __name__ == "__main__":
     import sys
 
@@ -183,16 +217,31 @@ if __name__ == "__main__":
         print("MEMORY_API_KEY 환경변수 필요")
         sys.exit(1)
 
-    if len(sys.argv) > 1 and sys.argv[1] == "save":
+    cmd = sys.argv[1] if len(sys.argv) > 1 else "verify"
+
+    if cmd == "save":
         memory_path = sys.argv[2] if len(sys.argv) > 2 else "agents/hermes/MEMORY.md"
         with open(memory_path, encoding="utf-8") as f:
             content = f.read()
         result = save_memory_md(content, api_key)
         print(json.dumps(result, ensure_ascii=False, indent=2))
-    else:
+
+    elif cmd == "verify-api":
+        # API 내부 일관성 검증 (content vs checksum 모두 API에서 로드)
         result = load_and_verify_memory_md(api_key)
         print(json.dumps({k: v for k, v in result.items() if k != "content"}, ensure_ascii=False, indent=2))
         if result.get("ok"):
-            print("[OK] MEMORY.md 무결성 검증 통과")
+            print("[OK] API 내부 무결성 검증 통과")
         else:
             print(f"[FAIL] {result.get('reason', '알 수 없는 오류')}")
+
+    else:
+        # 기본: 로컬 파일 → API 체크섬 비교 (세션 시작 시 변조 감지)
+        memory_path = sys.argv[2] if len(sys.argv) > 2 else "agents/hermes/MEMORY.md"
+        result = verify_local(memory_path, api_key)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        if result.get("ok"):
+            print("[OK] 로컬 MEMORY.md 무결성 검증 통과")
+        else:
+            print(f"[FAIL] {result.get('reason', '알 수 없는 오류')}")
+            sys.exit(1)
