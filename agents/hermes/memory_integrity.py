@@ -27,6 +27,7 @@ except ImportError:
 
 MEMORY_API_URL = "https://egs2.hyperbook.com"
 MEMORY_MD_KEY = "memory_md"
+CHECKSUM_KEY = "memory_md_checksum"
 TIMEOUT = 10
 LOCAL_FALLBACK = os.path.expanduser("~/.roops_memory_md_backup.json")
 
@@ -43,51 +44,39 @@ def save_memory_md(content: str, api_key: str) -> dict:
     checksum = compute_checksum(content)
     saved_at = datetime.now(timezone.utc).isoformat()
 
-    payload = {
-        "agent": "hermes",
-        "key": MEMORY_MD_KEY,
-        "data": {
-            "content": content,
-            "checksum": checksum,
-            "saved_at": saved_at,
-        },
-    }
-
-    _local_backup(payload["data"])
-
     headers = {"x-api-key": api_key, "Content-Type": "application/json"}
 
-    try:
-        if _USE_REQUESTS:
-            resp = _requests.post(
-                f"{MEMORY_API_URL}/memory/save",
-                json=payload,
-                headers=headers,
-                timeout=TIMEOUT,
-            )
-            ok = resp.status_code == 200
-            detail = resp.text[:120] if not ok else ""
-        else:
-            body = json.dumps(payload).encode("utf-8")
-            req = _urllib_request.Request(
-                f"{MEMORY_API_URL}/memory/save",
-                data=body,
-                headers=headers,
-                method="POST",
-            )
-            with _urllib_request.urlopen(req, timeout=TIMEOUT) as r:
-                ok = True
-                detail = ""
+    _local_backup({"content": content, "checksum": checksum, "saved_at": saved_at})
 
-        if ok:
+    try:
+        ok1 = _post_key(MEMORY_MD_KEY, content, headers)
+        ok2 = _post_key(CHECKSUM_KEY, checksum, headers)
+
+        if ok1 and ok2:
             print(f"[memory_integrity] 저장 완료. checksum={checksum[:16]}…")
             return {"saved": True, "checksum": checksum, "saved_at": saved_at}
-        print(f"[memory_integrity] API 저장 실패: {detail}")
+        print(f"[memory_integrity] API 저장 실패 (content:{ok1}, checksum:{ok2})")
     except Exception as e:
         print(f"[memory_integrity] API 오류: {e}")
 
     print("[memory_integrity] 로컬 폴백에만 저장됨")
     return {"saved": False, "checksum": checksum, "saved_at": saved_at, "local_only": True}
+
+
+def _post_key(key: str, content: str, headers: dict) -> bool:
+    payload = {"agent": "hermes", "key": key, "content": content}
+    if _USE_REQUESTS:
+        resp = _requests.post(
+            f"{MEMORY_API_URL}/memory/save", json=payload, headers=headers, timeout=TIMEOUT
+        )
+        return resp.status_code == 200
+    else:
+        body = json.dumps(payload).encode("utf-8")
+        req = _urllib_request.Request(
+            f"{MEMORY_API_URL}/memory/save", data=body, headers=headers, method="POST"
+        )
+        with _urllib_request.urlopen(req, timeout=TIMEOUT) as r:
+            return True
 
 
 def load_and_verify_memory_md(api_key: str) -> dict:
@@ -101,31 +90,39 @@ def load_and_verify_memory_md(api_key: str) -> dict:
     headers = {"x-api-key": api_key}
 
     try:
-        if _USE_REQUESTS:
-            resp = _requests.get(
-                f"{MEMORY_API_URL}/memory/load",
-                params={"agent": "hermes", "key": MEMORY_MD_KEY},
-                headers=headers,
-                timeout=TIMEOUT,
-            )
-            if resp.status_code != 200:
-                return {"ok": False, "reason": f"API HTTP {resp.status_code}"}
-            data = resp.json()
-        else:
-            import urllib.parse
-            params = urllib.parse.urlencode({"agent": "hermes", "key": MEMORY_MD_KEY})
-            req = _urllib_request.Request(
-                f"{MEMORY_API_URL}/memory/load?{params}",
-                headers=headers,
-                method="GET",
-            )
-            with _urllib_request.urlopen(req, timeout=TIMEOUT) as r:
-                data = json.loads(r.read())
-
+        content = _get_key(MEMORY_MD_KEY, headers)
+        stored_checksum = _get_key(CHECKSUM_KEY, headers)
     except Exception as e:
         return _verify_from_local(str(e))
 
-    return _verify_data(data)
+    return _verify_data({"content": content, "checksum": stored_checksum})
+
+
+def _get_key(key: str, headers: dict) -> Optional[str]:
+    import urllib.parse
+    params = urllib.parse.urlencode({"agent": "hermes", "key": key})
+    if _USE_REQUESTS:
+        resp = _requests.get(
+            f"{MEMORY_API_URL}/memory/load",
+            params={"agent": "hermes", "key": key},
+            headers=headers,
+            timeout=TIMEOUT,
+        )
+        if resp.status_code != 200:
+            return None
+        data = resp.json()
+    else:
+        req = _urllib_request.Request(
+            f"{MEMORY_API_URL}/memory/load?{params}", headers=headers, method="GET"
+        )
+        with _urllib_request.urlopen(req, timeout=TIMEOUT) as r:
+            data = json.loads(r.read())
+
+    memories = data.get("memories", [])
+    for m in memories:
+        if m.get("key_name") == key:
+            return m.get("content")
+    return None
 
 
 def _verify_data(data: dict) -> dict:
