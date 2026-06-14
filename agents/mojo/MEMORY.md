@@ -52,9 +52,11 @@
 | #roops-bridge | C0B4J28EZL4 | 팀 전체 공용 통신 |
 | #roops-heralds | C0B6K3TD5U6 | 전령단 (Hermes·Rudex·Mojo) |
 
-**Memory API:** `https://egs.hyperbook.com` (HTTPS, x-api-key 인증)
+**Memory API:** `https://egs2.hyperbook.com` (HTTPS, x-api-key 인증) ← 2026-06-14 이전
+- 구 URL: `https://egs.hyperbook.com` (폐기 예정)
 - `GET /memory/load?agent=mojo` — 세션 시작 시 컨텍스트 복원
 - `POST /memory/save` — 세션 종료 전 요약 저장 (`agent`, `key`, `content` 필드)
+- ⚠️ GCP 컨테이너 allowlist에 `egs2.hyperbook.com` 추가 필요 (Aegis에 요청)
 - ntfy: `https://ntfy.hyperbook.com` (Bearer 토큰, GCP 직접 접근 가능 확인됨 2026-06-06)
 
 **MEMORY.md 무결성 검증 (2026-06-10 도입):**
