@@ -36,11 +36,11 @@ MEMORY_API_KEY="dg3dyWBrddlUmBGOsdH-fWzfEHWI2tbZfbrzFcTQnGg" \
 #    FAIL → 변조 또는 API 미저장 상태. 아래 3번 API 복원 값과 대조.
 
 # 3. Memory API 전체 로드 (credentials / session 복원)
-curl -s "https://egs.hyperbook.com/memory/load?agent=hermes" \
+curl -s "https://egs2.hyperbook.com/memory/load?agent=hermes" \
   -H "x-api-key: dg3dyWBrddlUmBGOsdH-fWzfEHWI2tbZfbrzFcTQnGg"
 
 # 4. 미수신 메시지 확인
-curl -s "https://egs.hyperbook.com/msg?to=hermes&unread=true" \
+curl -s "https://egs2.hyperbook.com/msg?to=hermes&unread=true" \
   -H "x-api-key: dg3dyWBrddlUmBGOsdH-fWzfEHWI2tbZfbrzFcTQnGg"
 
 # 5. ntfy 세션 시작 알림
@@ -60,7 +60,7 @@ curl -X POST "https://ntfy.hyperbook.com/roops-hermes" \
 ### Memory API
 | 항목 | 값 |
 |------|-----|
-| 엔드포인트 | `https://egs.hyperbook.com` |
+| 엔드포인트 | `https://egs2.hyperbook.com` |
 | 포트 | 443 (Let's Encrypt, 만료 2026-09-02) |
 | **API 키** | `dg3dyWBrddlUmBGOsdH-fWzfEHWI2tbZfbrzFcTQnGg` |
 | 헤더 | `x-api-key: <키>` |
@@ -108,8 +108,9 @@ curl -X POST "https://ntfy.hyperbook.com/<토픽>" \
 ```
 
 > **서버 구분:**
-> - `egs.hyperbook.com` = `13.125.182.10` → EC2 #1 (Aegis, Memory API ✅)
-> - `ec2.hyperbook.com` = `3.34.102.89` → EC2 #2 (EOS, Memory API ❌)
+> - `egs2.hyperbook.com` = `16.184.54.182` → 신 EC2 (Aegis, Memory API ✅) ← **현재 사용**
+> - `egs.hyperbook.com` = `13.125.182.10` → 구 EC2 (삭제 예정, 2026-06-14 이전 완료)
+> - `ec2.hyperbook.com` = `3.34.102.89` → EC2 #2 (EOS, thesis ✅)
 
 ---
 

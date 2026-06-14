@@ -25,7 +25,7 @@ except ImportError:
     import urllib.error as _urllib_error
     _USE_REQUESTS = False
 
-MEMORY_API_URL = "https://egs.hyperbook.com"
+MEMORY_API_URL = "https://egs2.hyperbook.com"
 MEMORY_MD_KEY = "memory_md"
 TIMEOUT = 10
 LOCAL_FALLBACK = os.path.expanduser("~/.roops_memory_md_backup.json")
