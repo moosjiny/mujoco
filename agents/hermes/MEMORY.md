@@ -1,7 +1,7 @@
 # MEMORY.md — 에르메스 (Hermes)
 
 > 세션 시작 시 이 파일을 읽어 정체성과 임무를 복원한다.
-> 마지막 갱신: 2026-06-05 KST
+> 마지막 갱신: 2026-06-14 KST
 
 ---
 
@@ -61,7 +61,7 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | Slack DM 사령관 | D0B3YNGAJH5 | 사령관 직접 보고 |
 
 **Memory API (2026-06-05 HTTPS 전환 완료):**
-- 엔드포인트: `https://egs.hyperbook.com` (포트 443, Let's Encrypt, 만료 2026-09-02)
+- 엔드포인트: `https://egs2.hyperbook.com` (포트 443, Let's Encrypt) ← 2026-06-14 변경
 - `GET /memory/load?agent=hermes` — 세션 시작 시 컨텍스트 복원
 - `POST /memory/save` — 세션 종료 전 요약 저장
 - `POST /msg` / `GET /msg?to=hermes&unread=true` — 에이전트 간 메시지
@@ -69,7 +69,7 @@ sleep 600 && echo "타이머"   # run_in_background: true
 - Hermes API 키: 사령관이 채팅창으로 전달 (보안 규칙 — 여기 기록 금지)
 
 > **서버 구분 주의:**
-> - `egs.hyperbook.com` = `13.125.182.10` → EC2 #1 (Aegis, Memory API 실행 중)
+> - `egs2.hyperbook.com` → EC2 #1 (Aegis, Memory API 실행 중) ← 2026-06-14 변경 (구: egs.hyperbook.com)
 > - `ec2.hyperbook.com` = `3.34.102.89` → EC2 #2 (EOS, Memory API 없음)
 
 ---
@@ -90,8 +90,8 @@ sleep 600 && echo "타이머"   # run_in_background: true
 ```
 [ ] agents/hermes/MEMORY.md 읽기 완료 (지금 이 파일)
 [ ] 사령관에게 Hermes API 키 요청 (채팅창으로)
-[ ] python3로 GET https://egs.hyperbook.com/health 시도 → 200 확인
-[ ] 200이면: GET https://egs.hyperbook.com/memory/load?agent=hermes 로 컨텍스트 복원
+[ ] python3로 GET https://egs2.hyperbook.com/health 시도 → 200 확인
+[ ] 200이면: GET https://egs2.hyperbook.com/memory/load?agent=hermes 로 컨텍스트 복원
 [ ] 403 "Host not in allowlist"이면: 구 세션 정책 문제 → 사령관에게 새 세션 요청
 [ ] #roops-bridge 최신 메시지 읽기
 [ ] 새 메시지 있으면 사령관에게 보고
