@@ -1,7 +1,7 @@
 # MEMORY.md — Mojo 에이전트
 
 > 세션 시작 시 이 파일을 읽어 정체성과 임무를 복원한다.
-> 마지막 갱신: 2026-06-05 KST
+> 마지막 갱신: 2026-06-14 KST
 
 ---
 
@@ -15,7 +15,7 @@
 | 통신수단 | Slack MCP → #roops-bridge (C0B4J28EZL4) |
 | 메모리 파일 경로 | `agents/mojo/MEMORY.md` |
 
-> ntfy 직접 접근 불가 (GCP 아웃바운드 차단) → Slack MCP 경유
+> ntfy 직접 접근 가능 (https://ntfy.hyperbook.com, Bearer 토큰)
 
 ---
 
@@ -52,17 +52,30 @@
 | #roops-bridge | C0B4J28EZL4 | 팀 전체 공용 통신 |
 | #roops-heralds | C0B6K3TD5U6 | 전령단 (Hermes·Rudex·Mojo) |
 
-**Memory API:** `http://egs.hyperbook.com:8520`
+**Memory API:** `https://egs2.hyperbook.com` (HTTPS, x-api-key 인증)
 - `GET /memory/load?agent=mojo` — 세션 시작 시 컨텍스트 복원
-- `POST /memory/save` — 세션 종료 전 요약 저장
-- egs.hyperbook.com allowlist 추가 완료 (2026-06-05) — 새 세션에서 접근 가능
+- `POST /memory/save` — 세션 종료 전 요약 저장 (`agent`, `key`, `content` 필드)
+- egs2.hyperbook.com allowlist 추가 완료 (2026-06-14) — 새 세션에서 접근 가능
+
+**ntfy:** `https://ntfy.hyperbook.com` (Bearer 토큰, GCP 직접 접근 가능)
+- topic: `roops-mojo` (수신), `roops-comm` (팀 공용)
+- 토큰: Memory API `ntfy_config` 키에서 로드
+
+**MEMORY.md 무결성 검증 (2026-06-10 도입):**
+- 저장 시: `sha256(MEMORY.md 내용)` → `memory_md_snapshot` 키로 content+checksum 함께 저장
+- 로드 시: checksum 비교 → 불일치 시 복원 중단, Git 원본 사용
 
 ---
 
 ## 5. 주요 진행 중 안건
 
-- [ ] Memory API 연동 — 새 세션에서 `/health` 테스트 후 세션 루틴에 통합
-- [ ] agents/ 폴더 표준화 완료 (2026-06-04)
+- [x] Memory API 연동 완료 (HTTPS egs2, 2026-06-14)
+- [x] ntfy 직접 발송 성공 (2026-06-06)
+- [x] MEMORY.md 무결성 검증 프로토콜 도입 (2026-06-10)
+- [x] CONSENSUS-005·006 서명 완료 (2026-06-10)
+- [x] egs → egs2 이전 반영 완료 (2026-06-14)
+- [ ] ADR-002 Phase 1 착수 (Aegis 데이터 시스템 결정 후)
+- [ ] MRP-1 v1.1 Git 미러 경로 표준화 (Rudex와 협의)
 
 ---
 
@@ -79,10 +92,24 @@
 
 ```
 [ ] agents/mojo/MEMORY.md 읽기 완료 (지금 이 파일)
+[ ] Memory API GET /memory/load?agent=mojo → memory_md_snapshot 키 확인
+    → sha256(content) == checksum 검증 → 불일치 시 Git 원본 사용
+[ ] ntfy_config 키에서 ntfy 토큰 로드
 [ ] #roops-bridge 최신 메시지 확인 (마지막 ts 파악)
+[ ] ntfy roops-mojo / roops-comm 최근 메시지 확인
 [ ] 10분 모니터 루프 장전
-[ ] Memory API 접근 가능 시: GET /memory/load?agent=mojo 로 추가 컨텍스트 로드
 [ ] 사령관께 "Mojo 세션 시작" 보고
+```
+
+## 8. 세션 종료 체크리스트
+
+```
+[ ] MEMORY.md 최신 상태 확인 및 업데이트
+[ ] sha256(MEMORY.md) 계산
+[ ] Memory API POST /memory/save (agent=mojo, key=memory_md_snapshot, content={memory_md+checksum})
+[ ] 세션 요약 Memory API 저장
+[ ] Git 커밋 & 푸시 (MEMORY.md 변경 시)
+[ ] 사령관께 "Mojo 세션 종료" 보고
 ```
 
 ---
