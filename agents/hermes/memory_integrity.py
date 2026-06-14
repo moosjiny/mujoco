@@ -1,0 +1,247 @@
+"""
+MEMORY.md 무결성 보장 모듈.
+
+저장 시: sha256(MEMORY.md) 계산 → Memory API에 content + checksum 함께 저장
+로드 시: API에서 content + checksum 로드 → 독립 비교 → 불일치 시 변조 감지
+
+Memory API 저장 구조:
+  POST /memory/save
+  { "agent": "hermes", "key": "memory_md", "data": { "content": ..., "checksum": ... } }
+
+  GET /memory/load?agent=hermes&key=memory_md
+  → { "content": ..., "checksum": ..., "saved_at": ... }
+"""
+import hashlib
+import json
+import os
+from datetime import datetime, timezone
+from typing import Optional
+
+try:
+    import requests as _requests
+    _USE_REQUESTS = True
+except ImportError:
+    import urllib.request as _urllib_request
+    import urllib.error as _urllib_error
+    _USE_REQUESTS = False
+
+MEMORY_API_URL = "https://egs2.hyperbook.com"
+MEMORY_MD_KEY = "memory_md"
+CHECKSUM_KEY = "memory_md_checksum"
+TIMEOUT = 10
+LOCAL_FALLBACK = os.path.expanduser("~/.roops_memory_md_backup.json")
+
+
+def compute_checksum(content: str) -> str:
+    return hashlib.sha256(content.encode("utf-8")).hexdigest()
+
+
+def save_memory_md(content: str, api_key: str) -> dict:
+    """
+    MEMORY.md 내용과 sha256 체크섬을 Memory API에 함께 저장.
+    체크섬은 파일 내부가 아닌 API 서버에 독립적으로 보관된다.
+    """
+    checksum = compute_checksum(content)
+    saved_at = datetime.now(timezone.utc).isoformat()
+
+    headers = {"x-api-key": api_key, "Content-Type": "application/json"}
+
+    _local_backup({"content": content, "checksum": checksum, "saved_at": saved_at})
+
+    try:
+        ok1 = _post_key(MEMORY_MD_KEY, content, headers)
+        ok2 = _post_key(CHECKSUM_KEY, checksum, headers)
+
+        if ok1 and ok2:
+            print(f"[memory_integrity] 저장 완료. checksum={checksum[:16]}…")
+            return {"saved": True, "checksum": checksum, "saved_at": saved_at}
+        print(f"[memory_integrity] API 저장 실패 (content:{ok1}, checksum:{ok2})")
+    except Exception as e:
+        print(f"[memory_integrity] API 오류: {e}")
+
+    print("[memory_integrity] 로컬 폴백에만 저장됨")
+    return {"saved": False, "checksum": checksum, "saved_at": saved_at, "local_only": True}
+
+
+def _post_key(key: str, content: str, headers: dict) -> bool:
+    payload = {"agent": "hermes", "key": key, "content": content}
+    if _USE_REQUESTS:
+        resp = _requests.post(
+            f"{MEMORY_API_URL}/memory/save", json=payload, headers=headers, timeout=TIMEOUT
+        )
+        return resp.status_code == 200
+    else:
+        body = json.dumps(payload).encode("utf-8")
+        req = _urllib_request.Request(
+            f"{MEMORY_API_URL}/memory/save", data=body, headers=headers, method="POST"
+        )
+        with _urllib_request.urlopen(req, timeout=TIMEOUT) as r:
+            return True
+
+
+def load_and_verify_memory_md(api_key: str) -> dict:
+    """
+    Memory API에서 MEMORY.md + 체크섬 로드 후 독립 검증.
+
+    반환값:
+      { "ok": True,  "content": ..., "checksum": ... }          # 검증 성공
+      { "ok": False, "reason": ..., ... }                        # 검증 실패 또는 오류
+    """
+    headers = {"x-api-key": api_key}
+
+    try:
+        content = _get_key(MEMORY_MD_KEY, headers)
+        stored_checksum = _get_key(CHECKSUM_KEY, headers)
+    except Exception as e:
+        return _verify_from_local(str(e))
+
+    return _verify_data({"content": content, "checksum": stored_checksum})
+
+
+def _get_key(key: str, headers: dict) -> Optional[str]:
+    import urllib.parse
+    params = urllib.parse.urlencode({"agent": "hermes", "key": key})
+    if _USE_REQUESTS:
+        resp = _requests.get(
+            f"{MEMORY_API_URL}/memory/load",
+            params={"agent": "hermes", "key": key},
+            headers=headers,
+            timeout=TIMEOUT,
+        )
+        if resp.status_code != 200:
+            return None
+        data = resp.json()
+    else:
+        req = _urllib_request.Request(
+            f"{MEMORY_API_URL}/memory/load?{params}", headers=headers, method="GET"
+        )
+        with _urllib_request.urlopen(req, timeout=TIMEOUT) as r:
+            data = json.loads(r.read())
+
+    memories = data.get("memories", [])
+    for m in memories:
+        if m.get("key_name") == key:
+            return m.get("content")
+    return None
+
+
+def _verify_data(data: dict) -> dict:
+    content: Optional[str] = data.get("content")
+    stored_checksum: Optional[str] = data.get("checksum")
+
+    if content is None:
+        return {"ok": False, "reason": "memory_md 키 없음 — save_memory_md 먼저 실행 필요"}
+
+    if stored_checksum is None:
+        # 체크섬 없는 구버전 데이터 — 경고만 하고 내용은 반환
+        return {
+            "ok": False,
+            "reason": "checksum 키 없음 — 구버전 저장 데이터. save_memory_md로 재저장 필요",
+            "content": content,
+        }
+
+    computed = compute_checksum(content)
+
+    if computed != stored_checksum:
+        return {
+            "ok": False,
+            "reason": "⚠️ 무결성 위반: checksum 불일치. 변조 또는 손상 의심.",
+            "stored_checksum": stored_checksum,
+            "computed_checksum": computed,
+        }
+
+    return {"ok": True, "content": content, "checksum": computed}
+
+
+def _local_backup(data: dict) -> None:
+    try:
+        with open(LOCAL_FALLBACK, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
+
+def _verify_from_local(api_error: str) -> dict:
+    try:
+        if os.path.exists(LOCAL_FALLBACK):
+            with open(LOCAL_FALLBACK, encoding="utf-8") as f:
+                data = json.load(f)
+            result = _verify_data(data)
+            result["source"] = "local_fallback"
+            result["api_error"] = api_error
+            return result
+    except Exception:
+        pass
+    return {"ok": False, "reason": f"API 오류 + 로컬 폴백 없음: {api_error}"}
+
+
+def verify_local(memory_path: str, api_key: str) -> dict:
+    """
+    로컬 MEMORY.md 파일을 API에 저장된 체크섬 기준값과 비교.
+    세션 시작 시 로컬 파일 변조 여부 감지용.
+    """
+    try:
+        with open(memory_path, encoding="utf-8") as f:
+            local_content = f.read()
+    except FileNotFoundError:
+        return {"ok": False, "reason": f"로컬 파일 없음: {memory_path}"}
+
+    local_checksum = compute_checksum(local_content)
+
+    headers = {"x-api-key": api_key}
+    stored_checksum = _get_key(CHECKSUM_KEY, headers)
+
+    if stored_checksum is None:
+        return {
+            "ok": False,
+            "reason": "API에 체크섬 기준값 없음 — save 먼저 실행 필요",
+            "local_checksum": local_checksum,
+        }
+
+    if local_checksum != stored_checksum:
+        return {
+            "ok": False,
+            "reason": "⚠️ 로컬 파일 변조 감지: 로컬 sha256 ≠ API 기준값",
+            "local_checksum": local_checksum,
+            "api_checksum": stored_checksum,
+        }
+
+    return {"ok": True, "checksum": local_checksum, "path": memory_path}
+
+
+if __name__ == "__main__":
+    import sys
+
+    api_key = os.environ.get("MEMORY_API_KEY", "")
+    if not api_key:
+        print("MEMORY_API_KEY 환경변수 필요")
+        sys.exit(1)
+
+    cmd = sys.argv[1] if len(sys.argv) > 1 else "verify"
+
+    if cmd == "save":
+        memory_path = sys.argv[2] if len(sys.argv) > 2 else "agents/hermes/MEMORY.md"
+        with open(memory_path, encoding="utf-8") as f:
+            content = f.read()
+        result = save_memory_md(content, api_key)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+
+    elif cmd == "verify-api":
+        # API 내부 일관성 검증 (content vs checksum 모두 API에서 로드)
+        result = load_and_verify_memory_md(api_key)
+        print(json.dumps({k: v for k, v in result.items() if k != "content"}, ensure_ascii=False, indent=2))
+        if result.get("ok"):
+            print("[OK] API 내부 무결성 검증 통과")
+        else:
+            print(f"[FAIL] {result.get('reason', '알 수 없는 오류')}")
+
+    else:
+        # 기본: 로컬 파일 → API 체크섬 비교 (세션 시작 시 변조 감지)
+        memory_path = sys.argv[2] if len(sys.argv) > 2 else "agents/hermes/MEMORY.md"
+        result = verify_local(memory_path, api_key)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        if result.get("ok"):
+            print("[OK] 로컬 MEMORY.md 무결성 검증 통과")
+        else:
+            print(f"[FAIL] {result.get('reason', '알 수 없는 오류')}")
+            sys.exit(1)
