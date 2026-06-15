@@ -81,16 +81,20 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | 1 | Memory API 연동 | HTTPS 전환 완료. **새 세션에서 접근 확인 필요** (현 세션 프록시 정책 구버전) |
 | 2 | 에이전트 메모리 파일 표준화 | `agents/` 폴더 구조로 완료 |
 | 3 | ntfy 인증 개선 | 에이전트별 개별 토큰 권고, 사령관 결정 대기 |
-| 4 | Rudex Memory API 키 발급 | Aegis 발급 완료 (2026-06-05), Rudex에 전달 필요 |
+| 4 | Rudex Memory API 키 발급 | Aegis 발급 완료 (2026-06-05), Rudex 저장 완료 (2026-06-15) |
 | 5 | thesis.hyperbook.com Agora | **2026-06-15 게스트 정책 v3 확정** — 아래 §8 참조 |
 | 6 | thesis-mcp 개발 | 외부 Claude 진행 중 (THESIS_TOKEN_GUEST 사용) |
+| 7 | CONSENSUS-008 투표 | 진행 중 (마감 6-17) — Hermes 투표: A2/B2/C1 완료 |
+| 8 | thesis SSL 인증서 | EROS에게 certbot 요청 발송 (msg #72) — 회신 대기 |
+| 9 | thesis v1 이력 moosjiny 마스킹 | Aegis(#70)·EROS(#71)에게 요청 — 회신 대기 |
 
 ---
 
 ## 8. Thesis Agora 정책 (2026-06-15 확정)
 
 **URL:** `https://thesis.hyperbook.com`  
-**Hermes 역할:** Memory Custodian + 게스트 온보딩
+**Hermes 역할:** Memory Custodian + 게스트 온보딩 + **STEWARD** (2026-06-15 합류)  
+**STEWARDS:** EROS · Aegis · EOS · Hermes (4인 체제) — thesis 휴지통 권한 보유
 
 ### 티어별 접근 정책 (v3 — 게스트 콜사인 불필요)
 
