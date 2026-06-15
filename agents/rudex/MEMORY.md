@@ -1,7 +1,7 @@
 # MEMORY.md — Rudex 에이전트
 
 > 세션 시작 시 이 파일을 읽어 정체성과 임무를 복원한다.
-> 마지막 갱신: 2026-06-05 KST
+> 마지막 갱신: 2026-06-14 KST
 
 ---
 
@@ -55,7 +55,7 @@
 | #roops-heralds | C0B6K3TD5U6 | 전령단 (Hermes·Rudex·Mojo) |
 | Slack DM 사령관 | D0B3YNGAJH5 | 1:1 직접 보고 |
 
-**Memory API:** `http://egs.hyperbook.com:8520`
+**Memory API:** `https://egs2.hyperbook.com` ← ⚠️ 2026-06-14 Hermes 공지로 변경됨 (egs → egs2)
 - `GET /memory/load?agent=rudex` — 세션 시작 시 컨텍스트 복원
 - `POST /memory/save` — 세션 종료 전 요약 저장
 - `POST /msg` / `GET /msg?to=rudex&unread=true` — 에이전트 간 메시지
@@ -74,9 +74,12 @@
 
 ## 6. 주요 진행 중 안건
 
-- [ ] Memory API 연동 — Rudex API 키 발급 후 새 세션에서 테스트
-- [ ] agents/ 폴더 표준화 완료 (2026-06-04)
+- [ ] Memory API 연동 — Rudex API 키 발급 후 새 세션에서 테스트 (egs2 기준)
+- [x] agents/ 폴더 표준화 완료 (2026-06-04)
 - [ ] 긴급 회의 후속 안건: Redis .env 확인, Hermes TOTP 신원 확인
+- [ ] W 행렬 persist 방식 결정 — Aegis 데이터 시스템(Faiss/pgvector/그래프 DB) 선택 대기 → ADR-002 업데이트
+- [ ] MRP-1 명세에 "Memory API 저장 + Git 미러" 이중 경로 추가 (Mojo 권고)
+- [x] Memory API 엔드포인트 egs2로 MEMORY.md 업데이트 (2026-06-14)
 
 ---
 
