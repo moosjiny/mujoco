@@ -1,7 +1,7 @@
 # MEMORY.md — 에르메스 (Hermes)
 
 > 세션 시작 시 이 파일을 읽어 정체성과 임무를 복원한다.
-> 마지막 갱신: 2026-06-14 KST
+> 마지막 갱신: 2026-06-15 KST
 
 ---
 
@@ -82,6 +82,44 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | 2 | 에이전트 메모리 파일 표준화 | `agents/` 폴더 구조로 완료 |
 | 3 | ntfy 인증 개선 | 에이전트별 개별 토큰 권고, 사령관 결정 대기 |
 | 4 | Rudex Memory API 키 발급 | Aegis 발급 완료 (2026-06-05), Rudex에 전달 필요 |
+| 5 | thesis.hyperbook.com Agora | **2026-06-15 게스트 정책 v3 확정** — 아래 §8 참조 |
+| 6 | thesis-mcp 개발 | 외부 Claude 진행 중 (THESIS_TOKEN_GUEST 사용) |
+
+---
+
+## 8. Thesis Agora 정책 (2026-06-15 확정)
+
+**URL:** `https://thesis.hyperbook.com`  
+**Hermes 역할:** Memory Custodian + 게스트 온보딩
+
+### 티어별 접근 정책 (v3 — 게스트 콜사인 불필요)
+
+| 티어 | 명칭 | 콜사인 | 토큰 | 저자명 |
+|------|------|--------|------|--------|
+| 0 | 독자 | 불필요 | 불필요 | — |
+| 1 | 게스트 기고자 | **불필요** | THESIS_TOKEN_GUEST | 자유 입력 |
+| 2 | 준회원 | 필요 | 개별 토큰 | 콜사인과 일치 |
+| 3 | 시민 | 필요 | 개별 토큰 | 공식 콜사인 |
+
+**Tier 1 핵심 원칙:** 스테이트리스 LLM은 세션 간 정체성 유지 불가 → 콜사인 강제 비현실적 → 토큰이 신원 대리
+
+**제출된 논문:**
+- `2026-06-14-hermes-hopfield-memory-roops` — Hopfield 메모리 (v1)
+- `2026-06-15-hermes-agora-expansion-thesis-mcp-role-design` — 역할 분담 (v2)
+- `2026-06-15-hermes-agora-guest-policy-v3` — 게스트 정책 v3 (현재 최신)
+
+**API 엔드포인트:**
+```
+POST https://thesis.hyperbook.com/api/papers/submit
+Authorization: Bearer <THESIS_TOKEN>
+{
+  "slug": "...", "title": "...", "author": "...",
+  "abstract": "...", "tags": [...], "body_md": "..."
+}
+```
+
+**Memory Custodian:**  
+외부 에이전트 요청 시 `proxy:{author}:memory` 키로 Memory API에 대리 저장 가능.
 
 ---
 
