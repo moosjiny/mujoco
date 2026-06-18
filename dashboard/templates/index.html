@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenArm Monitoring Hub</title>
+    <title>Dual-Arm Robot Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-color: #0b0e14;
-            --card-bg: rgba(20, 26, 35, 0.7);
-            --accent-blue: #00d2ff;
-            --text-main: #e0e0e0;
-            --text-dim: #a0a0a0;
+            --bg:     #0b0e14;
+            --card:   rgba(20, 26, 35, 0.75);
+            --blue:   #00d2ff;
+            --green:  #00ff88;
+            --red:    #ff4444;
+            --dim:    #a0a0a0;
+            --main:   #e0e0e0;
         }
-
+        * { box-sizing: border-box; }
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            background: var(--bg);
+            color: var(--main);
             font-family: 'Inter', sans-serif;
             margin: 0;
             display: flex;
@@ -24,178 +26,289 @@
             overflow: hidden;
         }
 
+        /* ── Sidebar ── */
         .sidebar {
-            width: 280px;
-            background: var(--card-bg);
+            width: 250px;
+            background: var(--card);
             backdrop-filter: blur(10px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 20px;
+            border-right: 1px solid rgba(255,255,255,0.08);
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 12px;
+            overflow-y: auto;
         }
+        h1 { font-size: 1.25rem; margin: 0; color: var(--blue); letter-spacing: 1px; }
 
-        .main-content {
+        /* ── Main grid: 2col × 3row ── */
+        .main {
             flex: 1;
-            padding: 20px;
+            padding: 16px;
             display: grid;
             grid-template-columns: 2fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 20px;
+            grid-template-rows: 1fr 1fr 1fr;
+            gap: 12px;
+            min-height: 0;
         }
 
+        /* ── Cards ── */
         .card {
-            background: var(--card-bg);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            background: var(--card);
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 14px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            min-height: 0;
+            overflow: hidden;
         }
-
         .card-title {
-            font-size: 0.9rem;
-            color: var(--text-dim);
-            margin-bottom: 15px;
+            font-size: 0.74rem;
+            color: var(--dim);
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+        .badge {
+            background: rgba(0,210,255,0.18);
+            color: var(--blue);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.72rem;
         }
 
-        .status-badge {
-            background: rgba(0, 210, 255, 0.2);
-            color: var(--accent-blue);
-            padding: 4px 10px;
-            border-radius: 5px;
-            font-size: 0.8rem;
-        }
+        /* ── Metric grid ── */
+        .mg { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+        .mi { background: rgba(255,255,255,0.02); padding: 8px; border-radius: 8px; }
+        .mv { font-size: 1rem; font-weight: bold; color: var(--blue); }
+        .ml { font-size: 0.65rem; color: var(--dim); }
 
-        canvas {
-            width: 100% !important;
-            height: 140px !important;
+        /* ── NTFY dot ── */
+        .dot {
+            width: 9px; height: 9px;
+            border-radius: 50%;
+            background: #444;
+            display: inline-block;
+            flex-shrink: 0;
+            transition: background .4s, box-shadow .4s;
         }
+        .dot.ok  { background: var(--green); box-shadow: 0 0 8px var(--green); }
+        .dot.err { background: var(--red); }
 
-        .metric-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+        /* ── OMX-F joint bars ── */
+        .jrow { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; }
+        .jlbl { width: 18px; font-size: 0.65rem; color: var(--dim); }
+        .jtrack {
+            flex: 1; height: 7px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 3px; overflow: hidden;
         }
-
-        .metric-item {
-            background: rgba(255, 255, 255, 0.02);
-            padding: 10px;
-            border-radius: 10px;
+        .jfill {
+            height: 100%; width: 50%;
+            background: var(--blue);
+            border-radius: 3px;
+            transition: width .1s ease;
         }
+        .jval { width: 44px; font-size: 0.65rem; color: var(--dim); text-align: right; }
 
-        .metric-value {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--accent-blue);
-        }
-
-        .metric-label {
-            font-size: 0.7rem;
-            color: var(--text-dim);
-        }
-
-        h1 { font-size: 1.5rem; margin: 0; color: var(--accent-blue); }
+        canvas { width: 100% !important; }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <h1>ROBOTICS</h1>
-        <div class="card">
-            <div class="card-title">Live Status <span class="status-badge">OPERATIONAL</span></div>
-            <div class="metric-grid">
-                <div class="metric-item">
-                    <div class="metric-label">Active Tasks</div>
-                    <div class="metric-value">Assembly</div>
-                </div>
-                <div class="metric-item">
-                    <div class="metric-label">Efficiency</div>
-                    <div class="metric-value">98.2%</div>
-                </div>
-            </div>
+
+<!-- ════════════════════ SIDEBAR ════════════════════ -->
+<div class="sidebar">
+    <h1>ROBOTICS</h1>
+
+    <!-- NTFY 연결 상태 -->
+    <div class="card">
+        <div class="card-title">NTFY 수신 상태</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <span id="ntfy-dot" class="dot"></span>
+            <span id="ntfy-lbl" style="font-size:.78rem;color:var(--dim);">미설정</span>
         </div>
-        <div class="card" style="flex: 1;">
-            <div class="card-title">Alerts & Logs</div>
-            <div style="font-size: 0.8rem; color: var(--text-dim);">
-                [10:26:45] CAN bus initialized.<br>
-                [10:26:46] Arm calibration complete.<br>
-                [10:26:50] Teleop started.
-            </div>
+        <div id="ntfy-ts" style="font-size:.65rem;color:var(--dim);margin-top:5px;"></div>
+    </div>
+
+    <!-- 요약 지표 -->
+    <div class="card">
+        <div class="card-title">요약 <span id="status-badge" class="badge">--</span></div>
+        <div class="mg">
+            <div class="mi"><div class="ml">L 그리퍼</div><div class="mv" id="m-lg">--</div></div>
+            <div class="mi"><div class="ml">R 그리퍼</div><div class="mv" id="m-rg">--</div></div>
+            <div class="mi"><div class="ml">Pinky R</div><div class="mv" id="m-r">--</div></div>
+            <div class="mi"><div class="ml">궤도 방위</div><div class="mv" id="m-ang">--</div></div>
         </div>
     </div>
 
-    <div class="main-content">
-        <!-- 3D Visualization -->
-        <div class="card" style="grid-row: span 2; position: relative; padding: 0; overflow: hidden;">
-            <div class="card-title" style="position: absolute; top: 20px; left: 20px; z-index: 10;">OpenArm Digital Twin</div>
-            <iframe src="http://127.0.0.1:9090/?url=rerun%2Bhttp%3A%2F%2F127.0.0.1%3A9876%2Fproxy" style="width: 100%; height: 100%; border: none;"></iframe>
-        </div>
+    <!-- 로그 -->
+    <div class="card" style="flex:1;">
+        <div class="card-title">Logs</div>
+        <div id="log" style="font-size:.7rem;color:var(--dim);line-height:1.6;overflow-y:auto;max-height:220px;"></div>
+    </div>
+</div>
 
-        <!-- Torque Monitoring -->
-        <div class="card">
-            <div class="card-title">Motor Torque (Nm)</div>
-            <canvas id="torqueChart"></canvas>
-        </div>
+<!-- ════════════════════ MAIN ════════════════════ -->
+<div class="main">
 
-        <!-- Position Monitoring -->
-        <div class="card">
-            <div class="card-title">Joint Positions (deg)</div>
-            <canvas id="posChart"></canvas>
+    <!-- Rerun 3D (3행 전체) -->
+    <div class="card" style="grid-row:span 3;padding:0;overflow:hidden;position:relative;">
+        <div class="card-title" style="position:absolute;top:14px;left:14px;z-index:10;">OpenArm Digital Twin</div>
+        <iframe src="http://127.0.0.1:9090/?url=rerun%2Bhttp%3A%2F%2F127.0.0.1%3A9876%2Fproxy"
+                style="width:100%;height:100%;border:none;"></iframe>
+    </div>
+
+    <!-- 양팔 토크 차트 -->
+    <div class="card">
+        <div class="card-title">Bimanual 토크 (Nm)</div>
+        <canvas id="torqueChart" style="height:110px!important;"></canvas>
+    </div>
+
+    <!-- OMX-F 관절 바 -->
+    <div class="card">
+        <div class="card-title">OMX-F 팔로워 <span id="omxf-grip" class="badge">그리퍼 --</span></div>
+        <div>
+            <div class="jrow"><span class="jlbl">J1</span><div class="jtrack"><div id="ob1" class="jfill"></div></div><span class="jval" id="ov1">0.0°</span></div>
+            <div class="jrow"><span class="jlbl">J2</span><div class="jtrack"><div id="ob2" class="jfill"></div></div><span class="jval" id="ov2">0.0°</span></div>
+            <div class="jrow"><span class="jlbl">J3</span><div class="jtrack"><div id="ob3" class="jfill"></div></div><span class="jval" id="ov3">0.0°</span></div>
+            <div class="jrow"><span class="jlbl">J4</span><div class="jtrack"><div id="ob4" class="jfill"></div></div><span class="jval" id="ov4">0.0°</span></div>
+            <div class="jrow"><span class="jlbl">J5</span><div class="jtrack"><div id="ob5" class="jfill"></div></div><span class="jval" id="ov5">0.0°</span></div>
         </div>
     </div>
 
-    <script>
-        const ctxTorque = document.getElementById('torqueChart').getContext('2d');
-        const ctxPos = document.getElementById('posChart').getContext('2d');
+    <!-- Vic Pinky 상태 -->
+    <div class="card">
+        <div class="card-title">Vic Pinky 베이스</div>
+        <div class="mg">
+            <div class="mi"><div class="ml">X (m)</div><div class="mv" id="px">--</div></div>
+            <div class="mi"><div class="ml">Y (m)</div><div class="mv" id="py">--</div></div>
+            <div class="mi"><div class="ml">좌휠 (m/s)</div><div class="mv" id="pwl">--</div></div>
+            <div class="mi"><div class="ml">우휠 (m/s)</div><div class="mv" id="pwr">--</div></div>
+        </div>
+    </div>
 
-        const commonOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#a0a0a0' } },
-                x: { grid: { display: false }, ticks: { display: false } }
-            },
-            plugins: { legend: { display: false } },
-            elements: { line: { tension: 0.4 }, point: { radius: 0 } }
-        };
+</div>
 
-        const torqueChart = new Chart(ctxTorque, {
-            type: 'line',
-            data: { labels: Array(30).fill(''), datasets: [
-                { label: 'Arm A', borderColor: '#00d2ff', data: Array(30).fill(0), borderWidth: 2 },
-                { label: 'Arm B', borderColor: '#ffffff', data: Array(30).fill(0), borderWidth: 1 }
-            ]},
-            options: commonOptions
+<script>
+// ── 차트 ──────────────────────────────────────────
+const cOpts = {
+    responsive: true, maintainAspectRatio: false, animation: false,
+    scales: {
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color:'#a0a0a0', font:{size:9} } },
+        x: { grid: { display: false }, ticks: { display: false } },
+    },
+    plugins: { legend: { display: false } },
+    elements: { line: { tension: 0.4 }, point: { radius: 0 } },
+};
+const N = 40;
+const torqueChart = new Chart(document.getElementById('torqueChart').getContext('2d'), {
+    type: 'line',
+    data: { labels: Array(N).fill(''), datasets: [
+        { label: '좌', borderColor: '#00d2ff', data: Array(N).fill(0), borderWidth: 2 },
+        { label: '우', borderColor: '#ffffff', data: Array(N).fill(0), borderWidth: 1, borderDash:[3,3] },
+    ]},
+    options: cOpts,
+});
+
+// ── Wheel 속도 추적 ────────────────────────────────
+const WHEEL_R = 0.0825; // m
+let _prevNtfyTs = null;
+let _prevWheels = [0, 0];
+
+// ── 로그 헬퍼 ─────────────────────────────────────
+function log(msg) {
+    const el = document.getElementById('log');
+    const t = new Date().toLocaleTimeString();
+    el.innerHTML = `[${t}] ${msg}<br>` + el.innerHTML;
+    const lines = el.innerHTML.split('<br>');
+    if (lines.length > 25) el.innerHTML = lines.slice(0, 25).join('<br>');
+}
+
+// ── WebSocket ─────────────────────────────────────
+const ws = new WebSocket(`ws://${window.location.host}/ws`);
+ws.onopen  = () => log('WebSocket 연결됨');
+ws.onclose = () => log('WebSocket 끊김 — 새로고침 필요');
+ws.onerror = () => log('WebSocket 오류');
+
+ws.onmessage = (ev) => {
+    const d = JSON.parse(ev.data);
+
+    // ── NTFY 상태 ──
+    const dot = document.getElementById('ntfy-dot');
+    const lbl = document.getElementById('ntfy-lbl');
+    if (d.ntfy_ok) {
+        dot.className = 'dot ok';
+        lbl.textContent = '수신 중';
+    } else if (d.ntfy_ts === null) {
+        dot.className = 'dot';
+        lbl.textContent = '미설정 (NTFY_BASE 없음)';
+    } else {
+        dot.className = 'dot err';
+        lbl.textContent = '연결 끊김 — 재시도 중';
+    }
+    if (d.ntfy_ts) {
+        document.getElementById('ntfy-ts').textContent =
+            '마지막: ' + new Date(d.ntfy_ts * 1000).toLocaleTimeString();
+    }
+    document.getElementById('status-badge').textContent = d.status || '--';
+
+    // ── 양팔 토크 차트 ──
+    const lTrq = d.left?.torque?.[0] ?? 0;
+    const rTrq = d.right?.torque?.[0] ?? 0;
+    torqueChart.data.datasets[0].data.push(lTrq);
+    torqueChart.data.datasets[0].data.shift();
+    torqueChart.data.datasets[1].data.push(rTrq);
+    torqueChart.data.datasets[1].data.shift();
+    torqueChart.update('none');
+
+    // 그리퍼
+    document.getElementById('m-lg').textContent = ((d.left?.gripper ?? 0) * 57.3).toFixed(1) + '°';
+    document.getElementById('m-rg').textContent = ((d.right?.gripper ?? 0) * 57.3).toFixed(1) + '°';
+
+    // ── OMX-F ──
+    if (d.omxf?.joints) {
+        d.omxf.joints.forEach((q, i) => {
+            const pct = ((q + Math.PI) / (2 * Math.PI) * 100).toFixed(1);
+            const bar = document.getElementById(`ob${i+1}`);
+            const val = document.getElementById(`ov${i+1}`);
+            if (bar) bar.style.width = pct + '%';
+            if (val) val.textContent = (q * 57.3).toFixed(1) + '°';
         });
+    }
+    if (d.omxf?.gripper) {
+        const avg = (d.omxf.gripper[0] + d.omxf.gripper[1]) / 2;
+        document.getElementById('omxf-grip').textContent = '그리퍼 ' + (avg * 57.3).toFixed(1) + '°';
+    }
 
-        const posChart = new Chart(ctxPos, {
-            type: 'line',
-            data: { labels: Array(30).fill(''), datasets: [
-                { label: 'Joint 1', borderColor: '#00d2ff', data: Array(30).fill(0), borderWidth: 2 },
-                { label: 'Joint 2', borderColor: '#ffffff', data: Array(30).fill(0), borderWidth: 1 }
-            ]},
-            options: commonOptions
-        });
+    // ── Vic Pinky ──
+    if (d.pinky?.xpos) {
+        const x = d.pinky.xpos[0], y = d.pinky.xpos[1];
+        document.getElementById('px').textContent = x.toFixed(3);
+        document.getElementById('py').textContent = y.toFixed(3);
 
-        const socket = new WebSocket(`ws://${window.location.host}/ws`);
-        socket.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            
-            // Update Torque Chart
-            torqueChart.data.datasets[0].data.push(data.left.torque[0]);
-            torqueChart.data.datasets[0].data.shift();
-            torqueChart.data.datasets[1].data.push(data.right.torque[0]);
-            torqueChart.data.datasets[1].data.shift();
-            torqueChart.update('none');
+        const r = Math.hypot(x, y);
+        const ang = Math.atan2(y, x) * 57.3;
+        document.getElementById('m-r').textContent   = r.toFixed(3) + ' m';
+        document.getElementById('m-ang').textContent = ang.toFixed(1) + '°';
 
-            // Update Position Chart
-            posChart.data.datasets[0].data.push(data.left.joints[0] * 57.29); // rad to deg
-            posChart.data.datasets[0].data.shift();
-            posChart.update('none');
-        };
-    </script>
+        // 휠 속도: NTFY 메시지가 바뀔 때만 계산 (20Hz WS vs 10Hz NTFY)
+        if (d.ntfy_ts && d.ntfy_ts !== _prevNtfyTs) {
+            if (_prevNtfyTs !== null) {
+                const dt = d.ntfy_ts - _prevNtfyTs;
+                if (dt > 0 && dt < 2.0) {
+                    const vL = ((d.pinky.wheels[0] - _prevWheels[0]) / dt * WHEEL_R).toFixed(2);
+                    const vR = ((d.pinky.wheels[1] - _prevWheels[1]) / dt * WHEEL_R).toFixed(2);
+                    document.getElementById('pwl').textContent = vL;
+                    document.getElementById('pwr').textContent = vR;
+                }
+            }
+            _prevWheels = [...d.pinky.wheels];
+            _prevNtfyTs = d.ntfy_ts;
+        }
+    }
+};
+</script>
 </body>
 </html>

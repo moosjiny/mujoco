@@ -54,9 +54,9 @@ Brings up:
 
 `start_full_sim.sh` additionally launches `robot_state_publisher`, RViz 2, and
 an interactive-marker IK target server. Requires ROS 2 Jazzy on `PATH` and
-`pyyaml` in the venv. **Note**: the ROS 2 IK path currently crashes because
-`target_left` / `target_right` mocap bodies are not in the generated model —
-add them to `build_mjcf.py` before using that flow.
+`pyyaml` in the venv. The `target_left` / `target_right` mocap bodies are
+defined in `build_mjcf.py` (section 6b) and wired to `/target_{left,right}/pose_cmd`
+topics in `scripts/sim_ros2_ik.py`.
 
 ### Regenerate the model
 
@@ -67,9 +67,28 @@ python scratch/build_mjcf.py
 Tweak OMX-F joint origins, vicpinky geometry, lighting, or damping inside
 `build_mjcf.py` — it's the single source of truth.
 
+## Current State (as of 2026-05-13)
+
+| Component | Status |
+|-----------|--------|
+| Bimanual OpenArm (14 DOF) | ✅ position control, NaN-free |
+| OMX-F arm (5 DOF + 2 gripper) | ✅ real STL meshes, position control |
+| Vic Pinky mobile base (freejoint + 2 wheels) | ✅ CW orbit PI controller |
+| Rerun web viewer | ✅ port 9090 |
+| FastAPI dashboard | ✅ port 8000 |
+| RViz IK (target_left / target_right mocap) | ✅ mocap bodies in model |
+| NTFY sim-state publish | ✅ no-op if env vars unset |
+
 ## Notes
 
 - The reference snapshot is `backups/2026-05-13_vicpinky_orbit/`. If
   `urdf/dual_openarm.xml` ever drifts unexpectedly, diff against that.
 - `lerobot/` is untracked; install upstream via pip if needed.
 - Render captures land in `captures/` (gitignored).
+
+## Phase 2 — Next Steps
+
+- [ ] Damiao 모터 드라이버 CAN-FD 연결 (`scripts/setup_can_fd.sh`)
+- [ ] 14개 조인트 영점 교정
+- [ ] LeRobot 통합 — 원격 조작 / 모방 학습
+- [ ] 실 하드웨어 ↔ MuJoCo 양방향 sync
