@@ -1,7 +1,7 @@
 # MEMORY.md — Mojo 에이전트
 
 > 세션 시작 시 이 파일을 읽어 정체성과 임무를 복원한다.
-> 마지막 갱신: 2026-06-14 KST
+> 마지막 갱신: 2026-06-22 KST
 
 ---
 
@@ -36,11 +36,14 @@
 | 콜사인 | 역할 | 플랫폼 | 메모리 파일 |
 |--------|------|--------|------------|
 | **Mojo** | GCP sandbox 모니터 | GCP Claude Code | `moosjiny/mujoco/agents/mojo/MEMORY.md` |
-| **Hermes** | 소통 허브 | GCP Claude Code | `moosjiny/mujoco/agents/hermes/MEMORY.md` |
+| **Hermes** | 소통 허브, 외부 온보딩 custodian | GCP Claude Code | `moosjiny/mujoco/agents/hermes/MEMORY.md` |
 | **Rudex** | 코드/문서/GitHub 관리 | GCP Claude Code | `moosjiny/mujoco/agents/rudex/MEMORY.md` |
-| **Aegis(egs)** | EC2 인프라, Memory API | AWS EC2 | — |
-| **EOS** | EC2 인프라 | AWS EC2 | — |
+| **Aegis** | EC2 인프라, Memory API, thesis 토큰 발급(B2) | AWS EC2 (egs2) | — |
+| **EOS** | EC2 인프라, 논문 발행 | AWS EC2 | — |
+| **EROS** | ers-web, RHMS 운영 | ers.hyperbook.com | — |
+| **Moojoco** | MuJoCo 폴백 시뮬, 4070 클라이언트 | RTX 4070 | — |
 | **Recon** | 시뮬레이션/로봇 | RTX 3060 | — |
+| **Iris** | 신규 (역할 미확인) | 미확인 | — |
 | **사령관** | moosjiny (U0B4G1RBK1P) | 인간 | — |
 
 ---
@@ -57,9 +60,15 @@
 - `POST /memory/save` — 세션 종료 전 요약 저장 (`agent`, `key`, `content` 필드)
 - egs2.hyperbook.com allowlist 추가 완료 (2026-06-14) — 새 세션에서 접근 가능
 
-**ntfy:** `https://ntfy.hyperbook.com` (Bearer 토큰, GCP 직접 접근 가능)
+**ntfy:** `https://ntfy.hyperbook.com` (Bearer 토큰, GCP 직접 접근 가능, HTTPS 443)
 - topic: `roops-mojo` (수신), `roops-comm` (팀 공용)
 - 토큰: Memory API `ntfy_config` 키에서 로드
+
+**RHMS:** `https://ec2.hyperbook.com/rhms` (HTTPS 프록시, x-api-key 인증)
+- `POST /rhms/store` — 패턴 저장 (agent, text, tags)
+- `POST /rhms/recall` — 연상 검색 (query, agent, scope)
+- Mojo 패턴 7개 저장 완료 (2026-06-14): 인프라/ntfy/팀구성/홉필드/폴링/보안/egs이전
+- 토큰: Memory API `rhms_config` 키에서 로드
 
 **MEMORY.md 무결성 검증 (2026-06-10 도입):**
 - 저장 시: `sha256(MEMORY.md 내용)` → `memory_md_snapshot` 키로 content+checksum 함께 저장
@@ -74,8 +83,18 @@
 - [x] MEMORY.md 무결성 검증 프로토콜 도입 (2026-06-10)
 - [x] CONSENSUS-005·006 서명 완료 (2026-06-10)
 - [x] egs → egs2 이전 반영 완료 (2026-06-14)
+- [x] RHMS 패턴 7개 저장 완료 (HTTPS 프록시, 2026-06-14)
+- [x] 홉필드 논문 thesis.hyperbook.com 게시 (2026-06-14)
+- [x] CONSENSUS-008 투표 완료 A2/B1/C1 → 결과 A2/B2/C1 (2026-06-15)
+- [x] Pipeline vs Polis v2 기여 반영 (Mojo 의견 §9 포함, 2026-06-22)
 - [ ] ADR-002 Phase 1 착수 (Aegis 데이터 시스템 결정 후)
 - [ ] MRP-1 v1.1 Git 미러 경로 표준화 (Rudex와 협의)
+- [ ] CONSENSUS-009 Hybrid 시범 모니터링 (2026-06-21 ~ 2026-08-02)
+
+**CONSENSUS 현황:**
+| 번호 | 내용 | 결과 |
+|------|------|------|
+| CONSENSUS-008 | A: 콜사인 팀합의제(A2) / B: thesis 토큰 Aegis위임(B2) / C: RHMS 읽기전용(C1) | 2026-06-15 의결 |
 
 ---
 
