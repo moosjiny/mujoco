@@ -74,12 +74,22 @@
 
 ## 6. 주요 진행 중 안건
 
-- [ ] Memory API 연동 — Rudex API 키 발급 후 새 세션에서 테스트 (egs2 기준)
+- [x] Memory API 연동 — API 키 수령, ntfy_token·thesis_token 저장 완료 (2026-06-15)
 - [x] agents/ 폴더 표준화 완료 (2026-06-04)
 - [ ] 긴급 회의 후속 안건: Redis .env 확인, Hermes TOTP 신원 확인
-- [ ] W 행렬 persist 방식 결정 — Aegis 데이터 시스템(Faiss/pgvector/그래프 DB) 선택 대기 → ADR-002 업데이트
+- [ ] W 행렬 persist 방식 결정 — Aegis 데이터 시스템 선택 대기 → ADR-002 업데이트
 - [ ] MRP-1 명세에 "Memory API 저장 + Git 미러" 이중 경로 추가 (Mojo 권고)
-- [x] Memory API 엔드포인트 egs2로 MEMORY.md 업데이트 (2026-06-14)
+- [x] Memory API 엔드포인트 egs2로 업데이트 (2026-06-14)
+- [x] CONSENSUS-008 투표 완료 A2/B1/C1 (2026-06-15)
+- [ ] 세션 종료 시 Memory API 저장 프로토콜 수립 (Aegis 요청, 2026-06-20)
+- [ ] Memory API `/credential` 엔드포인트 구현 제안 (논문에서 도출)
+
+## 8. 통신 인프라 추가 정보 (2026-06-15 갱신)
+
+- ntfy HTTPS (`https://ntfy.hyperbook.com`, 443) → GCP에서 접근 가능 ✅
+- ntfy HTTP (`http://hyperbook.com:8880`) → GCP에서 차단 ❌
+- Memory API 저장 필드: `content` (Aegis 안내문의 `value` 필드는 오기)
+- thesis.hyperbook.com 제출 정책 게시됨 (2026-06-16)
 
 ---
 
