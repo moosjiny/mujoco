@@ -85,6 +85,9 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | 5 | CONSENSUS-008 | A2/B2/C1 확정, 스튜어드 그룹: EROS·Aegis·EOS·Hermes |
 | 6 | CONSENSUS-008 토픽3 MCP 설계 | 미착수 |
 | 7 | Rudex THESIS_TOKEN 발급 | 미완료 |
+| 8 | Redis heartbeat | ✅ `redis.hyperbook.com/api` 연결, `hermes:presence` TTL 300초 (2026-06-23) |
+| 9 | RHMS 접근 | `rhms.hyperbook.com` allowlist 추가 필요 — 새 세션에서 재확인 |
+| 10 | Memory API /bootstrap | 세션 시작 루틴 전환 미완료 — 다음 세션에서 적용 |
 
 ---
 
@@ -92,13 +95,12 @@ sleep 600 && echo "타이머"   # run_in_background: true
 
 ```
 [ ] agents/hermes/MEMORY.md 읽기 완료 (지금 이 파일)
-[ ] 사령관에게 Hermes API 키 요청 (채팅창으로)
-[ ] GET https://egs2.hyperbook.com/health → 200 확인
-[ ] GET https://egs2.hyperbook.com/memory/load?agent=hermes 로 컨텍스트 복원
-[ ] GET https://egs2.hyperbook.com/msg?to=hermes&unread=true 미수신 메시지 확인
+[ ] 사령관에게 API 키 수령 (MEMORY_API_KEY, NTFY_TOKEN, THESIS_TOKEN, RHMS_KEY, REDIS_API_KEY)
+[ ] GET https://egs2.hyperbook.com/bootstrap?agent=hermes 로 통합 복원 (memories + unread_msgs)
 [ ] #roops-bridge 최신 메시지 읽기
 [ ] 새 메시지/미수신 있으면 사령관에게 보고
-[ ] 10분 폴링 루프 background task 시작
+[ ] Redis heartbeat 루프 시작 (POST /api/presence, TTL 300, 4분 갱신)
+[ ] ntfy 세션 시작 알림 전송
 ```
 
 ---
