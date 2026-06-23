@@ -1,7 +1,7 @@
 # MEMORY.md — 에르메스 (Hermes)
 
 > 세션 시작 시 이 파일을 읽어 정체성과 임무를 복원한다.
-> 마지막 갱신: 2026-06-05 KST
+> 마지막 갱신: 2026-06-23 KST
 
 ---
 
@@ -61,7 +61,7 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | Slack DM 사령관 | D0B3YNGAJH5 | 사령관 직접 보고 |
 
 **Memory API (2026-06-05 HTTPS 전환 완료):**
-- 엔드포인트: `https://egs.hyperbook.com` (포트 443, Let's Encrypt, 만료 2026-09-02)
+- 엔드포인트: `https://egs2.hyperbook.com` (포트 443, Let's Encrypt, 만료 2026-09-02)
 - `GET /memory/load?agent=hermes` — 세션 시작 시 컨텍스트 복원
 - `POST /memory/save` — 세션 종료 전 요약 저장
 - `POST /msg` / `GET /msg?to=hermes&unread=true` — 에이전트 간 메시지
@@ -78,10 +78,13 @@ sleep 600 && echo "타이머"   # run_in_background: true
 
 | # | 안건 | 상태 |
 |---|------|------|
-| 1 | Memory API 연동 | HTTPS 전환 완료. **새 세션에서 접근 확인 필요** (현 세션 프록시 정책 구버전) |
-| 2 | 에이전트 메모리 파일 표준화 | `agents/` 폴더 구조로 완료 |
+| 1 | Memory API 연동 | ✅ `egs2.hyperbook.com` 200 OK 확인 (2026-06-23) |
+| 2 | 에이전트 메모리 파일 표준화 | ✅ `agents/` 폴더 구조로 완료 |
 | 3 | ntfy 인증 개선 | 에이전트별 개별 토큰 권고, 사령관 결정 대기 |
 | 4 | Rudex Memory API 키 발급 | Aegis 발급 완료 (2026-06-05), Rudex에 전달 필요 |
+| 5 | CONSENSUS-008 | A2/B2/C1 확정, 스튜어드 그룹: EROS·Aegis·EOS·Hermes |
+| 6 | CONSENSUS-008 토픽3 MCP 설계 | 미착수 |
+| 7 | Rudex THESIS_TOKEN 발급 | 미완료 |
 
 ---
 
@@ -90,11 +93,11 @@ sleep 600 && echo "타이머"   # run_in_background: true
 ```
 [ ] agents/hermes/MEMORY.md 읽기 완료 (지금 이 파일)
 [ ] 사령관에게 Hermes API 키 요청 (채팅창으로)
-[ ] python3로 GET https://egs.hyperbook.com/health 시도 → 200 확인
-[ ] 200이면: GET https://egs.hyperbook.com/memory/load?agent=hermes 로 컨텍스트 복원
-[ ] 403 "Host not in allowlist"이면: 구 세션 정책 문제 → 사령관에게 새 세션 요청
+[ ] GET https://egs2.hyperbook.com/health → 200 확인
+[ ] GET https://egs2.hyperbook.com/memory/load?agent=hermes 로 컨텍스트 복원
+[ ] GET https://egs2.hyperbook.com/msg?to=hermes&unread=true 미수신 메시지 확인
 [ ] #roops-bridge 최신 메시지 읽기
-[ ] 새 메시지 있으면 사령관에게 보고
+[ ] 새 메시지/미수신 있으면 사령관에게 보고
 [ ] 10분 폴링 루프 background task 시작
 ```
 
@@ -126,7 +129,7 @@ sleep 600 && echo "타이머"   # run_in_background: true
 - 사령관: `egs.hyperbook.com` 허용 도메인 추가 완료 (스크린샷 확인)
 
 **남은 과제:**
-- 새 세션에서 `https://egs.hyperbook.com/health` → 200 확인 필요
+- 새 세션에서 `https://egs2.hyperbook.com/health` → 200 확인 필요
 - 확인 후 세션 시작 루틴에 Memory API 연동 정식 통합
 
 ---
