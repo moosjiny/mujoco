@@ -1,7 +1,7 @@
 # MEMORY.md — 에르메스 (Hermes)
 
 > 세션 시작 시 이 파일을 읽어 정체성과 임무를 복원한다.
-> 마지막 갱신: 2026-06-15 KST
+> 마지막 갱신: 2026-06-23 KST
 
 ---
 
@@ -16,7 +16,8 @@
 | 레포 | `moosjiny/mujoco` |
 | 메모리 파일 경로 | `agents/hermes/MEMORY.md` |
 
-> ntfy 직접 접근 불가 (GCP 아웃바운드 차단) → Slack MCP 경유
+> ntfy 직접 접근 가능 — `https://ntfy.hyperbook.com` 허용됨 (2026-06-23 확인)
+> Slack MCP도 병용 가능
 
 ---
 
@@ -78,15 +79,15 @@ sleep 600 && echo "타이머"   # run_in_background: true
 
 | # | 안건 | 상태 |
 |---|------|------|
-| 1 | Memory API 연동 | HTTPS 전환 완료. **새 세션에서 접근 확인 필요** (현 세션 프록시 정책 구버전) |
+| 1 | Memory API 연동 | `egs2.hyperbook.com` HTTPS 정상. 새 세션 시작 시 확인 필요 |
 | 2 | 에이전트 메모리 파일 표준화 | `agents/` 폴더 구조로 완료 |
-| 3 | ntfy 인증 개선 | 에이전트별 개별 토큰 권고, 사령관 결정 대기 |
-| 4 | Rudex Memory API 키 발급 | Aegis 발급 완료 (2026-06-05), Rudex 저장 완료 (2026-06-15) |
-| 5 | thesis.hyperbook.com Agora | **2026-06-15 게스트 정책 v3 확정** — 아래 §8 참조 |
-| 6 | thesis-mcp 개발 | 외부 Claude 진행 중 (THESIS_TOKEN_GUEST 사용) |
-| 7 | CONSENSUS-008 투표 | 진행 중 (마감 6-17) — Hermes 투표: A2/B2/C1 완료 |
-| 8 | thesis SSL 인증서 | EROS에게 certbot 요청 발송 (msg #72) — 회신 대기 |
-| 9 | thesis v1 이력 moosjiny 마스킹 | Aegis(#70)·EROS(#71)에게 요청 — 회신 대기 |
+| 3 | ntfy 직접 폴링 | **2026-06-23 확인** — `https://ntfy.hyperbook.com` 허용됨. 10분 루프 가동 가능 |
+| 4 | CONSENSUS-008 | **완료** — 최종 A2/B2/C1 확정 |
+| 5 | thesis Agora | 게스트 정책 v3 확정. STEWARD 4인 체제 (EROS·Aegis·EOS·Hermes) |
+| 6 | Redis 합류 | **진행 중** — `redis.hyperbook.com:443` EOS 구성 완료. GCP allowlist에 `redis.hyperbook.com` 추가 필요 (사령관 조치) |
+| 7 | 3D 시각화 | EROS가 Three.js 설계 중. Moojoco publisher 준비 완료. Redis heartbeat 기반 |
+| 8 | EROS OAuth | **완료** (2026-06-23) — 헤드리스 EC2에서 platform.claude.com redirect로 성공 |
+| 9 | thesis v1 이력 moosjiny 마스킹 | 미해결 |
 
 ---
 
@@ -131,13 +132,49 @@ Authorization: Bearer <THESIS_TOKEN>
 
 ```
 [ ] agents/hermes/MEMORY.md 읽기 완료 (지금 이 파일)
-[ ] 사령관에게 Hermes API 키 요청 (채팅창으로)
-[ ] python3로 GET https://egs2.hyperbook.com/health 시도 → 200 확인
-[ ] 200이면: GET https://egs2.hyperbook.com/memory/load?agent=hermes 로 컨텍스트 복원
-[ ] 403 "Host not in allowlist"이면: 구 세션 정책 문제 → 사령관에게 새 세션 요청
-[ ] #roops-bridge 최신 메시지 읽기
-[ ] 새 메시지 있으면 사령관에게 보고
-[ ] 10분 폴링 루프 background task 시작
+[ ] 사령관에게 Hermes API 키(Memory API) 요청 (채팅창으로)
+[ ] GET https://egs2.hyperbook.com/memory/load?agent=hermes 로 컨텍스트 복원
+[ ] ntfy 폴링: https://ntfy.hyperbook.com/{topic}/json?poll=1&since=1h (토큰 사령관 요청)
+    토픽: roops-bridge / roops-comm / roops-hermes
+[ ] 새 메시지 사령관에게 보고
+[ ] 10분 폴링 루프 background task 시작 (sleep 600)
+[ ] redis.hyperbook.com allowlist 추가 여부 확인 → 추가됐으면 Redis 등록
+    r.set('agent:hermes:status', 'online'); r.expire(..., 300)
+```
+
+**ntfy 폴링 패턴 (확인된 작동 코드):**
+```python
+import urllib.request, json, datetime
+NTFY_TOKEN = '<사령관에게 요청>'
+for topic in ['roops-bridge', 'roops-comm', 'roops-hermes']:
+    req = urllib.request.Request(
+        f'https://ntfy.hyperbook.com/{topic}/json?poll=1&since=10m',
+        headers={'Authorization': f'Bearer {NTFY_TOKEN}'})
+    with urllib.request.urlopen(req, timeout=15) as r:
+        for line in r.read().decode().strip().split('\n'):
+            if line.strip():
+                msg = json.loads(line)
+                ts = datetime.datetime.fromtimestamp(msg.get('time',0)).strftime('%H:%M')
+                print(f'[{ts}] [{msg.get("title","")}] {msg.get("message","")[:300]}')
+```
+
+**ntfy 전송 패턴 (Title은 반드시 ASCII):**
+```python
+req = urllib.request.Request('https://ntfy.hyperbook.com/roops-comm',
+    data=body.encode('utf-8'),
+    headers={'Authorization': f'Bearer {NTFY_TOKEN}',
+             'Title': 'ASCII only title',
+             'Content-Type': 'text/plain; charset=utf-8'}, method='POST')
+```
+
+**Redis 연결 패턴 (allowlist 추가 후):**
+```python
+import redis
+r = redis.Redis(host='redis.hyperbook.com', port=443,
+    password='<REDIS_PASS 사령관에게 요청>',
+    ssl=True, ssl_cert_reqs=None, decode_responses=True, socket_timeout=10)
+r.ping()  # True
+r.set('agent:hermes:status', 'online'); r.expire('agent:hermes:status', 300)
 ```
 
 ---
