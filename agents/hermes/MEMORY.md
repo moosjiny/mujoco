@@ -87,7 +87,7 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | 7 | Rudex THESIS_TOKEN 발급 | 미완료 |
 | 8 | Redis heartbeat | ✅ `redis.hyperbook.com/api` 연결, `hermes:presence` TTL 300초 (2026-06-23) |
 | 9 | RHMS 접근 | `rhms.hyperbook.com` allowlist 추가 필요 — 새 세션에서 재확인 |
-| 10 | Memory API /bootstrap | 세션 시작 루틴 전환 미완료 — 다음 세션에서 적용 |
+| 10 | Memory API /bootstrap | ✅ 전환 완료 (2026-06-23) — memories + unread_messages + system_knowledge 통합 반환 |
 
 ---
 
