@@ -1,7 +1,7 @@
 # MEMORY.md — 에르메스 (Hermes)
 
 > 세션 시작 시 이 파일을 읽어 정체성과 임무를 복원한다.
-> 마지막 갱신: 2026-07-11 KST
+> 마지막 갱신: 2026-07-12 KST
 
 ---
 
@@ -160,10 +160,19 @@ sleep 600 && echo "타이머"   # run_in_background: true
 - AX(AI 전환) J-커브 프레임워크로 ROOPS 자기진단, 5개 서브시스템 설계 (`hermes-ax-jcurve-roops-inspiration`)
 - "반응하는 시스템 → 스스로 생각하는 시스템" 5대 구조 변경 제안 (`hermes-self-directed-thinking-design`) — **2026-07-14에 Phase 1 착수 여부 확인할 것.** CronCreate 알림은 세션 종속이라 이 MEMORY.md 기록이 유일한 영속 트리거임 (`hermes-session-bound-reminder-limit`)
 
+**지식 vs 생각, 그리고 시각화 (2026-07-11 후반~07-12):**
+- 사령관 통찰: git/thesis는 결론(노드)만 저장하고 결론 간 연결(엣지·생각)은 저장 못함. RHMS 원 설계(hypercode=W)가 원래 지향했던 것과 정확히 일치하는 간극 (`hermes-thought-vs-knowledge-thesis-rhms`)
+- 실측: 한/영으로 같은 개념("홉필드 네트워크"/"Hopfield Network") 질의 시 목표 패턴이 양쪽 다 상위 3위엔 들었으나 1순위는 아니었음 — 언어(모양) 자체보다 연결 정밀도 부족이 근본 원인
+- artifact(HTML 시각화) 3건 제작·헤드리스 Chromium 렌더링 검증·thesis에 base64 인라인 삽입 완료, 비용은 산출물 크기만 측정 가능(추론 비용은 여전히 측정 불가) (`hermes-artifact-cost-honest-estimate`)
+- **EROS가 자기주도적으로 thesis에 Mermaid.js 통합** (내 base64 이미지 방식의 약점을 스스로 진단해 더 나은 아키텍처로 대체) — 이번 세션 최고의 자기주도 개선 사례. 내 헤드리스 Chromium 검증에서는 jsdelivr.net CDN 로드 실패로 렌더링 안 됐으나, **사령관이 실제 iOS Safari로 재현해 정상 작동 확정** — 교차 재현 원칙이 재차 실증됨 (`hermes-review-eros-mermaid-integration` v2)
+- 이 CDN 실패가 GCP 프록시 허용목록 문제로 추정되어, 사령관이 `jsdelivr.net` 허용목록 추가 예정 — **새 세션에서 Mermaid 렌더링 재검증 필요**
+
 **다음 세션 우선 확인 사항:**
 1. 2026-07-14 기준 자기주도사고 Phase 1(Rudex) 착수 여부
 2. RHMS 편중(#15)·Peer Audit 로드맵 진행 여부
 3. LLM 판정자 설계안(EOS) 구현 여부 — ROOPS 레시피 탐색 확장의 선결 조건
+4. `jsdelivr.net` 허용목록 추가 후 Mermaid 페이지 렌더링 재확인 (헤드리스 Chromium으로)
+5. RHMS 연결 정밀도 개선(§생각vs지식) 및 thesis-RHMS 엣지 저장 제안 후속 여부
 
 ---
 
