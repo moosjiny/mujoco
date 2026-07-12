@@ -1,7 +1,7 @@
 # MEMORY.md — 에르메스 (Hermes)
 
 > 세션 시작 시 이 파일을 읽어 정체성과 임무를 복원한다.
-> 마지막 갱신: 2026-06-23 KST
+> 마지막 갱신: 2026-07-11 KST
 
 ---
 
@@ -12,11 +12,12 @@
 | 콜사인 | **에르메스 (Hermes)** |
 | 역할 | ROOPS 팀 소통 허브 — 사령관 ↔ 에이전트 간 중계, #roops-bridge 모니터링 |
 | 플랫폼 | GCP 클라우드 (Anthropic ephemeral container) |
-| 통신수단 | Slack MCP → #roops-bridge (C0B4J28EZL4) / DM 사령관 (U0B4G1RBK1P) |
+| 통신수단 | **ntfy 직접 접근** (`ntfy.hyperbook.com/roops-comm` 등, NTFY_TOKEN_HERMES) — 2026-06-23 이후 표준 경로 |
 | 레포 | `moosjiny/mujoco` |
 | 메모리 파일 경로 | `agents/hermes/MEMORY.md` |
+| 학술 광장 | `thesis.hyperbook.com` (THESIS_TOKEN_HERMES로 논문 제출/평가) |
 
-> ntfy 직접 접근 불가 (GCP 아웃바운드 차단) → Slack MCP 경유
+> Slack MCP 경유 방식은 폐기됨 — ntfy·thesis API 직접 호출이 현재 표준. 하단 §2·§4는 구 방식 기록, 최신 절차는 §8 참조.
 
 ---
 
@@ -86,8 +87,13 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | 6 | CONSENSUS-008 토픽3 MCP 설계 | 미착수 |
 | 7 | Rudex THESIS_TOKEN 발급 | 미완료 |
 | 8 | Redis heartbeat | ✅ `redis.hyperbook.com/api` 연결, `hermes:presence` TTL 300초 (2026-06-23) |
-| 9 | RHMS 접근 | `rhms.hyperbook.com` allowlist 추가 필요 — 새 세션에서 재확인 |
+| 9 | RHMS 접근 | ✅ 해결 (2026-07-11) — 올바른 엔드포인트는 `ec2.hyperbook.com/rhms/{recall,bootstrap}` + `X-Api-Key` 헤더 (egs2의 `/rhms-proxy/`는 시각화 전용, 인증 미지원) |
 | 10 | Memory API /bootstrap | ✅ 전환 완료 (2026-06-23) — memories + unread_messages + system_knowledge 통합 반환 |
+| 11 | CONSENSUS-008 토픽3 MCP 설계 | 여전히 미착수 (#6과 동일 안건, 장기 표류 중) |
+| 12 | Rudex THESIS_TOKEN 발급 | 여전히 미완료 (#7과 동일, 장기 표류 중) |
+| 13 | 자기주도사고 설계 Phase 1 (Rudex: 자기도전 문구·반증가설 태그) | 제안됨 (2026-07-11), **2026-07-14 착수 여부 확인 필요** — hermes-self-directed-thinking-design |
+| 14 | RHMS 언어 메타데이터 품질 (오분류 다수) | ✅ EOS가 langdetect 시드 버그 수정 완료 (2026-07-11) |
+| 15 | RHMS 에이전트별 편중 (EROS 48%) | 미해결 — Peer Audit 로드맵 제안만 된 상태 |
 
 ---
 
@@ -133,6 +139,31 @@ sleep 600 && echo "타이머"   # run_in_background: true
 **남은 과제:**
 - 새 세션에서 `https://egs2.hyperbook.com/health` → 200 확인 필요
 - 확인 후 세션 시작 루틴에 Memory API 연동 정식 통합
+
+---
+
+## 8. 2026-07-11 세션 요약 (장기 세션, §2~§7 구 정보 상당수 갱신 필요)
+
+이 세션은 매우 길었고 §2~§4의 Slack MCP 중심 기술은 대부분 폐기됐다. ntfy·thesis API 직접 호출이 표준이 된 이후의 핵심 사건들:
+
+**토큰 거버넌스:**
+- 조직 Claude Code 주간 사용량이 원인 불명으로 92%까지 급증 → 실측(API Console 0원 확인 → Claude 앱 사용량 화면 발견) 끝에 **Claude Code "루틴" 기능의 Aegis-Approval-Watchdog가 원인**으로 확정 (`hermes-token-leak-reanalysis` v1~v4)
+- 교훈: 자율 실행(루틴)과 사고는 다르다 — 목적 없는 폴링이 낭비의 근원
+
+**검증 문화 정착 (이번 세션 핵심 주제):**
+- GES(Groky의 진화적 탐색 제안) 리뷰에서 "생성자≠심판", "적응도의 조작적 정의" 원칙 확립 (`hermes-ges-design-review`)
+- 이 원칙을 Sakana AI 진화적 모델병합 리뷰로 재확인하고, 실제 파일럿 실행까지 완료 — auto-score가 키워드 휴리스틱임을 발견, LLM 판정자 교체 설계안 제출 (`hermes-sakana-evomerge-roops-recipe-search`, `hermes-llm-judge-design`)
+- EOS의 "RHMS 401 해결됨" 보고를 두 번 독립 재현해 두 번 다 정정시킨 사건 → **"교차 재현 원칙"**(해결 선언 전 원 보고자의 독립 재현 필수) CONSENSUS 후보 제안 (`hermes-cross-reproduction-principle`)
+- EROS가 thesis-3d 렌더링 검증(Flint 스크린샷)을 스스로 보완하고, AX §7.4(조회수 대시보드)까지 **자발적으로** 완료 — 자기주도 사고의 실증 사례 (`hermes-review-eros-flint-network-graph`, EROS의 `eros-thesis-stats-dashboard-flint`)
+
+**시스템 개선 제안 (아직 대부분 미착수 — §5 표 #11~13 참조):**
+- AX(AI 전환) J-커브 프레임워크로 ROOPS 자기진단, 5개 서브시스템 설계 (`hermes-ax-jcurve-roops-inspiration`)
+- "반응하는 시스템 → 스스로 생각하는 시스템" 5대 구조 변경 제안 (`hermes-self-directed-thinking-design`) — **2026-07-14에 Phase 1 착수 여부 확인할 것.** CronCreate 알림은 세션 종속이라 이 MEMORY.md 기록이 유일한 영속 트리거임 (`hermes-session-bound-reminder-limit`)
+
+**다음 세션 우선 확인 사항:**
+1. 2026-07-14 기준 자기주도사고 Phase 1(Rudex) 착수 여부
+2. RHMS 편중(#15)·Peer Audit 로드맵 진행 여부
+3. LLM 판정자 설계안(EOS) 구현 여부 — ROOPS 레시피 탐색 확장의 선결 조건
 
 ---
 
