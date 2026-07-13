@@ -117,7 +117,8 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | 17 | **키 git 이력 유출 감사** | ✅ 감사 완료 (2026-07-13), 로테이션 대기 — 상세는 §10 참조. MEMORY_API_KEY·NTFY_TOKEN·THESIS_TOKEN 3종이 피처 브랜치 3개(8개 커밋)에 존재, **main은 깨끗**. 레포 Private + 브랜치 미병합이라 외부 유출 아닌 내부 위생 문제로 분류 (사령관 판단, 2026-07-13). **긴급 아닌 계획적 로테이션**으로 진행 |
 | 18 | Aegis 키 로테이션 준비 회신 | ⏳ 대기 중 — 2026-07-13 roops-comm으로 준비 요청 발송 (키 3종, 순차 절차 명시). 회신 오면 사령관 경유로 로테이션 실행 |
 | 19 | Hermes 운영방침 | ✅ 제출 완료 (2026-07-13) — `2026-07-13-hermes-operational-policy`. EOS 레지스트리 §6 미제출 항목 해소 |
-| 20 | EOS 레지스트리 v2 | ⏳ 대기 중 — hermes_bridge "논리 소유/호스트 운영" 분리 표기 정정 요청 + 집중 분석 논문의 안건 3건(컬럼 분리·크리티컬 폴백·평가 분리) 반영 여부 확인 필요 |
+| 20 | EOS 레지스트리 v2 | ✅ 반영 확인 (2026-07-13 ntfy) — 소유/운영 컬럼 분리, 크리티컬 폴백(ntfy→Slack #roops-heralds 등), SPOF 리스크 표 추가됨. 잔여: 서비스 4개 논리 소유자 미할당, 운영방침 미제출 4명(Moojoco·Rudex·Recon·Iris) |
+| 21 | 조벽 교수 강의 분석 (사령관 공개 과제) | ⏳ 원자료 대기 — youtube는 GCP 프록시 차단(실측). 분석 계획서 게시함: `2026-07-13-hermes-jobyuk-lecture-analysis-plan`. 접근 가능 에이전트(EROS 유력)가 `*-jobyuk-lecture-source`를 thesis에 올리면 계획서 §2 절차로 2차 분석 → `hermes-jobyuk-future-literacy-roops` 제출. 사전 가설 4건은 계획서에 명시 — 자료로 검증·기각할 것 |
 
 ---
 
@@ -270,6 +271,7 @@ sleep 600 && echo "타이머"   # run_in_background: true
 1. roops-comm에서 Aegis 로테이션 회신 + EOS 레지스트리 v2 반응 확인 (#18, #20)
 2. 로테이션 실행 시 §10 절차 준수 (credentials 레코드 선갱신 → 새 키 200 → 구키 401 → 브랜치 3개 정리)
 3. 2026-07-14 자기주도사고 Phase 1 착수 여부 확인 (#13)
+4. thesis에서 `jobyuk-lecture-source` 검색 — 원자료 올라왔으면 분석 계획서 절차대로 2차 분석 수행 (#21)
 
 ---
 
