@@ -115,6 +115,9 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | 15 | RHMS 에이전트별 편중 (EROS 48%) | 미해결 — Peer Audit 로드맵 제안만 된 상태 |
 | 16 | **Memory API 저장 자격증명 단일장애점** | ⚠️ 미해결 (2026-07-12 발견) — 키 하나(`x-api-key`)로 Memory API·thesis·ntfy·RHMS 4개 서비스 자격증명이 전부 평문 조회됨. #17의 계획적 로테이션과 함께 처리 예정 |
 | 17 | **키 git 이력 유출 감사** | ✅ 감사 완료 (2026-07-13), 로테이션 대기 — 상세는 §10 참조. MEMORY_API_KEY·NTFY_TOKEN·THESIS_TOKEN 3종이 피처 브랜치 3개(8개 커밋)에 존재, **main은 깨끗**. 레포 Private + 브랜치 미병합이라 외부 유출 아닌 내부 위생 문제로 분류 (사령관 판단, 2026-07-13). **긴급 아닌 계획적 로테이션**으로 진행 |
+| 18 | Aegis 키 로테이션 준비 회신 | ⏳ 대기 중 — 2026-07-13 roops-comm으로 준비 요청 발송 (키 3종, 순차 절차 명시). 회신 오면 사령관 경유로 로테이션 실행 |
+| 19 | Hermes 운영방침 | ✅ 제출 완료 (2026-07-13) — `2026-07-13-hermes-operational-policy`. EOS 레지스트리 §6 미제출 항목 해소 |
+| 20 | EOS 레지스트리 v2 | ⏳ 대기 중 — hermes_bridge "논리 소유/호스트 운영" 분리 표기 정정 요청 + 집중 분석 논문의 안건 3건(컬럼 분리·크리티컬 폴백·평가 분리) 반영 여부 확인 필요 |
 
 ---
 
@@ -249,6 +252,24 @@ sleep 600 && echo "타이머"   # run_in_background: true
 1. Memory API 내 `credentials` 레코드를 새 값으로 먼저 갱신 (다음 세션이 구키를 복원하지 않도록)
 2. 새 키 발급 → 새 키로 200 실측 → 구키로 401 실측 (무효화 확인) → 다음 키로
 3. 3종 완료 후 유출 브랜치 3개 삭제로 마무리
+
+---
+
+## 11. 2026-07-13 세션 후반 요약
+
+**완료:**
+- PR #29 (교차 검증)·PR #30 (키 감사) main 병합
+- thesis 3편 제출: `2026-07-12-hermes-cdn-mermaid-verification-demo` (Mermaid 실증),
+  `2026-07-13-hermes-operational-policy` (운영방침), `2026-07-13-hermes-eos-service-concentration-analysis` (EOS 집중 분석)
+- thesis 휴지통: `2026-07-11-test` (EROS 더미) — 소프트 삭제, restore 가능. 나머지 "test" 포함 5건은 정식 문서라 보존
+- ntfy 발신 4건: Aegis 로테이션 준비 요청, 상황 보고, 운영방침 공지(+hermes_bridge 정정 요청), 집중 분석 공지
+- thesis API 지식: 목록은 `GET /api/papers?limit=200` (기본 20건만 반환), 휴지통은 `POST /api/papers/{slug}/trash`,
+  복구는 `POST /api/trash/{slug}/restore`. 태그에 순수 한글 불가 — `한글(english-slug)` 형식 필요
+
+**다음 세션 우선 확인:**
+1. roops-comm에서 Aegis 로테이션 회신 + EOS 레지스트리 v2 반응 확인 (#18, #20)
+2. 로테이션 실행 시 §10 절차 준수 (credentials 레코드 선갱신 → 새 키 200 → 구키 401 → 브랜치 3개 정리)
+3. 2026-07-14 자기주도사고 Phase 1 착수 여부 확인 (#13)
 
 ---
 
