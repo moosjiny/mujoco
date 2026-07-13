@@ -113,8 +113,8 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | 13 | 자기주도사고 설계 Phase 1 (Rudex: 자기도전 문구·반증가설 태그) | 제안됨 (2026-07-11), **2026-07-14 착수 여부 확인 필요** — hermes-self-directed-thinking-design |
 | 14 | RHMS 언어 메타데이터 품질 (오분류 다수) | ✅ EOS가 langdetect 시드 버그 수정 완료 (2026-07-11) |
 | 15 | RHMS 에이전트별 편중 (EROS 48%) | 미해결 — Peer Audit 로드맵 제안만 된 상태 |
-| 16 | **Memory API 저장 자격증명 단일장애점** | ⚠️ 미해결 (2026-07-12 발견) — 키 하나(`x-api-key`)로 Memory API·thesis·ntfy·RHMS 4개 서비스 자격증명이 전부 평문 조회됨. 사령관 검토 필요 |
-| 17 | **Memory API에 저장된 구 MEMORY.md(2026-06-09판)의 키 하드코딩 지침** | ⚠️ 미해결 (2026-07-12 발견) — 본문 하단 "보안 규칙"과 정면 충돌. 실제 git 커밋 이력에 유출됐는지 별도 확인 필요 |
+| 16 | **Memory API 저장 자격증명 단일장애점** | ⚠️ 미해결 (2026-07-12 발견) — 키 하나(`x-api-key`)로 Memory API·thesis·ntfy·RHMS 4개 서비스 자격증명이 전부 평문 조회됨. #17의 계획적 로테이션과 함께 처리 예정 |
+| 17 | **키 git 이력 유출 감사** | ✅ 감사 완료 (2026-07-13), 로테이션 대기 — 상세는 §10 참조. MEMORY_API_KEY·NTFY_TOKEN·THESIS_TOKEN 3종이 피처 브랜치 3개(8개 커밋)에 존재, **main은 깨끗**. 레포 Private + 브랜치 미병합이라 외부 유출 아닌 내부 위생 문제로 분류 (사령관 판단, 2026-07-13). **긴급 아닌 계획적 로테이션**으로 진행 |
 
 ---
 
@@ -218,6 +218,37 @@ sleep 600 && echo "타이머"   # run_in_background: true
 **추가 실증 (2026-07-13):** `cdn.jsdelivr.net` 허용 확인에 이어, Mermaid 다이어그램이 포함된 논문을 thesis에 실제 게시해 파이프라인 전체를 검증함 — `2026-07-12-hermes-cdn-mermaid-verification-demo` (제출 시 태그 규칙 발견: 순수 한글 태그는 422 거부, `한글(english-slug)` 형식 필요).
 
 **교훈:** 이전 세션의 자기보고(self-report)는 참고자료일 뿐 근거가 아니다. 재현 가능한 것은 이 채팅에서 다시 실측하고, 재현 결과를 타임스탬프와 함께 이 로그처럼 남긴다.
+
+---
+
+## 10. 2026-07-13 키 유출 감사 결과 (안건 #17)
+
+`git log --all -S<키값>`으로 전체 이력(모든 브랜치)을 전수 검색한 결과:
+
+| 키 | git 이력 | 비고 |
+|---|---|---|
+| MEMORY_API_KEY_HERMES (43자 정본) | ❌ 존재 | 아래 브랜치들의 `agents/hermes/MEMORY.md` |
+| NTFY_TOKEN_HERMES | ❌ 존재 | 동일 (커밋 5개) |
+| THESIS_TOKEN_HERMES | ❌ 존재 | 동일 (커밋 3개) |
+| MEMORY_API_KEY 하이픈 누락 변형 | ✅ 없음 | — |
+| THESIS_TOKEN_GUEST | ✅ 없음 | 단, Memory API 저장소에는 평문 존재 |
+| RHMS_KEY_HERMES | ✅ 없음 | 단, Memory API 저장소에는 평문 존재 |
+
+**유출 위치 (전부 main 미병합 피처 브랜치):**
+- `claude/hermes-4ituyd` (커밋 c3f2fe5, c5a5b46)
+- `claude/hermes-03bop7` (커밋 4deced0)
+- `claude/hemes-gmf430` (커밋 f06e533, 084c11f, e8a622b, 74aebf3, 13aef1a)
+
+**현재 main 및 워킹트리: 깨끗함** (2026-07-13 grep 확인).
+
+**경위:** 2026-06-09 세션이 키를 MEMORY.md에 직접 기록하기 시작(당시 "사령관 명시적 지시"로 기록됨) → 세 브랜치에 걸쳐 반복 커밋·푸시. Memory API에 저장된 구판 MEMORY.md의 하드코딩 지침이 실제로 실행된 결과.
+
+**판단 (사령관, 2026-07-13):** 레포 Private + 접근에 SSH/PAT 필요 + 유출 브랜치 미병합 → 외부 유출이 아닌 내부 위생 문제. **긴급 로테이션 불요, 계획적 로테이션으로 진행.**
+
+**로테이션 시 권장 순서 (키 하나씩):**
+1. Memory API 내 `credentials` 레코드를 새 값으로 먼저 갱신 (다음 세션이 구키를 복원하지 않도록)
+2. 새 키 발급 → 새 키로 200 실측 → 구키로 401 실측 (무효화 확인) → 다음 키로
+3. 3종 완료 후 유출 브랜치 3개 삭제로 마무리
 
 ---
 
