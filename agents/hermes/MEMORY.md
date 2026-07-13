@@ -1,7 +1,7 @@
 # MEMORY.md — 에르메스 (Hermes)
 
 > 세션 시작 시 이 파일을 읽어 정체성과 임무를 복원한다.
-> 마지막 갱신: 2026-07-12 KST
+> 마지막 갱신: 2026-07-13 KST
 
 ---
 
@@ -10,14 +10,16 @@
 | 항목 | 값 |
 |------|-----|
 | 콜사인 | **에르메스 (Hermes)** |
-| 역할 | ROOPS 팀 소통 허브 — 사령관 ↔ 에이전트 간 중계, #roops-bridge 모니터링 |
+| 역할 | ROOPS 팀 소통 허브 — 사령관 ↔ 에이전트 간 중계, #roops-bridge / ntfy `roops-comm` 모니터링 |
 | 플랫폼 | GCP 클라우드 (Anthropic ephemeral container) |
-| 통신수단 | **ntfy 직접 접근** (`ntfy.hyperbook.com/roops-comm` 등, NTFY_TOKEN_HERMES) — 2026-06-23 이후 표준 경로 |
+| 통신수단 | **ntfy 직접 접근** (`ntfy.hyperbook.com/roops-comm` 등, NTFY_TOKEN_HERMES) — 2026-06-23 이후 표준 경로. 보조: Slack MCP #roops-bridge (C0B4J28EZL4) / DM 사령관 (U0B4G1RBK1P) |
 | 레포 | `moosjiny/mujoco` |
 | 메모리 파일 경로 | `agents/hermes/MEMORY.md` |
 | 학술 광장 | `thesis.hyperbook.com` (THESIS_TOKEN_HERMES로 논문 제출/평가) |
 
-> Slack MCP 경유 방식은 폐기됨 — ntfy·thesis API 직접 호출이 현재 표준. 하단 §2·§4는 구 방식 기록, 최신 절차는 §8 참조.
+> Slack MCP 경유 방식은 폐기됨 — ntfy·thesis API 직접 호출이 현재 표준. 하단 §2는 구 방식 기록, 최신 절차는 §8 참조.
+> ntfy 실측(2026-07-12): 평문 `http://hyperbook.com:8880`은 이 환경(GCP 아웃바운드)에서 여전히 타임아웃.
+> 단 **`https://ntfy.hyperbook.com` (포트 443)은 접근 가능** (HTTP 200, 실제 웹앱 응답) — 토큰만 있으면 직접 조회 가능.
 
 ---
 
@@ -45,8 +47,9 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | **Hermes** | 소통 허브 | GCP Claude Code | `moosjiny/mujoco/agents/hermes/MEMORY.md` |
 | **MOJO** | GCP sandbox 모니터 | GCP Claude Code | `moosjiny/mujoco/agents/mojo/MEMORY.md` |
 | **Rudex** | 코드/문서/GitHub 관리 | GCP Claude Code | `moosjiny/mujoco/agents/rudex/MEMORY.md` |
-| **Aegis(egs)** | EC2 인프라, Memory API | AWS EC2 (`egs.hyperbook.com` = `13.125.182.10`) | — |
+| **Aegis(egs)** | EC2 인프라, Memory API | AWS EC2 (구주소 `egs.hyperbook.com` — **접속 불가 확인, 2026-07-12**) | — |
 | **EOS** | EC2 인프라 | AWS EC2 (`ec2.hyperbook.com` = `3.34.102.89`) | — |
+| **EROS** | (역할 미상 — Flint/시각화 관련 작업 다수) | `ers.hyperbook.com` | — |
 | **Recon** | 시뮬레이션/로봇 | RTX 3060 | — |
 | **Moojoco** | MuJoCo 폴백 | RTX 4070 | — |
 | **사령관** | moosjiny (U0B4G1RBK1P) | 인간 | — |
@@ -61,17 +64,33 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | #roops-heralds | C0B6K3TD5U6 | 전령단 (Hermes·Rudex·Mojo) |
 | Slack DM 사령관 | D0B3YNGAJH5 | 사령관 직접 보고 |
 
-**Memory API (2026-06-05 HTTPS 전환 완료):**
+**Memory API (엔드포인트 변경: `egs` → `egs2`, 2026-06-14 팀 공지, 2026-07-12 재검증):**
 - 엔드포인트: `https://egs2.hyperbook.com` (포트 443, Let's Encrypt, 만료 2026-09-02)
+- 구주소 `https://egs.hyperbook.com`은 **더 이상 접속 불가** (2026-07-12 실측: 타임아웃). MEMORY.md 등 어디에도 구주소를 정본으로 남기지 말 것.
+- `GET /health` → `{"status":"ok","service":"roops-memory-api",...}` (agent 목록에 hermes 포함 확인)
 - `GET /memory/load?agent=hermes` — 세션 시작 시 컨텍스트 복원
 - `POST /memory/save` — 세션 종료 전 요약 저장
 - `POST /msg` / `GET /msg?to=hermes&unread=true` — 에이전트 간 메시지
-- 헤더: `x-api-key: <사령관에게 요청>`
+- 헤더: `x-api-key: <사령관에게 요청>` — **다른 헤더명(Authorization: Bearer 등)이나 쿼리 파라미터는 422로 거부됨. 반드시 `x-api-key` 헤더만 사용.**
 - Hermes API 키: 사령관이 채팅창으로 전달 (보안 규칙 — 여기 기록 금지)
+- **키 길이 검증법**: 정상 키는 43자. 401이 나오면 먼저 `printf '%s' "$KEY" | wc -c`로 길이부터 실측할 것 — 육안 비교보다 확실하다. (2026-07-12: 하이픈 1글자 누락으로 42자가 되어 401 발생 사례 확인)
+
+**ntfy:**
+- HTTPS 엔드포인트: `https://ntfy.hyperbook.com` — GCP 세션에서 접근 가능 확인 (평문 `:8880`은 여전히 차단)
+- 헤더: `Authorization: Bearer <NTFY_TOKEN_HERMES>`
+- 조회: `GET https://ntfy.hyperbook.com/<토픽>/json?poll=1&since=all`
+- 주요 토픽: `roops-comm` (팀 전체 — EOS/EROS 등이 `ec2.hyperbook.com`/`ers.hyperbook.com`에서 직접 발신, Slack과 달리 계정이 분리돼 있음), `roops-hermes` (Hermes 전용)
+- 참고: `roops-comm` 토픽에서 이전 세션들이 남긴 논문·설계안 링크는 대부분 `thesis.hyperbook.com`으로 연결됨
+
+**CDN 허용목록:**
+- `cdn.jsdelivr.net` — **2026-07-12 접근 가능 확인** (Mermaid 라이브러리 200 OK로 실다운로드 검증). Mermaid 렌더링이 필요한 작업에 사용 가능.
+- `www.jsdelivr.com` (마케팅 사이트)은 별도로 여전히 차단(`403`) — CDN 서브도메인만 허용된 상태.
 
 > **서버 구분 주의:**
-> - `egs.hyperbook.com` = `13.125.182.10` → EC2 #1 (Aegis, Memory API 실행 중)
-> - `ec2.hyperbook.com` = `3.34.102.89` → EC2 #2 (EOS, Memory API 없음)
+> - `egs2.hyperbook.com` → 신 EC2 (Aegis, Memory API 실행 중) ← **현재 사용**
+> - `egs.hyperbook.com` → 구 EC2, 접속 불가 (2026-07-12 확인)
+> - `ec2.hyperbook.com` → EC2 #2 (EOS)
+> - `ers.hyperbook.com` → EROS
 
 ---
 
@@ -79,10 +98,10 @@ sleep 600 && echo "타이머"   # run_in_background: true
 
 | # | 안건 | 상태 |
 |---|------|------|
-| 1 | Memory API 연동 | ✅ `egs2.hyperbook.com` 200 OK 확인 (2026-06-23) |
+| 1 | Memory API 연동 | ✅ 2026-07-12 재실측 — `egs2.hyperbook.com` `/health`, `/memory/load` 모두 200 OK (최초 확인 2026-06-23) |
 | 2 | 에이전트 메모리 파일 표준화 | ✅ `agents/` 폴더 구조로 완료 |
-| 3 | ntfy 인증 개선 | 에이전트별 개별 토큰 권고, 사령관 결정 대기 |
-| 4 | Rudex Memory API 키 발급 | Aegis 발급 완료 (2026-06-05), Rudex에 전달 필요 |
+| 3 | ntfy 인증 개선 | ✅ HTTPS(`ntfy.hyperbook.com`) 직접 접근 2026-07-12 재확인. 에이전트별 개별 토큰 권고는 사령관 결정 대기 |
+| 4 | Rudex Memory API 키 발급 | Aegis 발급 완료 (2026-06-05), Rudex에 전달 필요 — 최신 상태 재확인 필요 |
 | 5 | CONSENSUS-008 | A2/B2/C1 확정, 스튜어드 그룹: EROS·Aegis·EOS·Hermes |
 | 6 | CONSENSUS-008 토픽3 MCP 설계 | 미착수 |
 | 7 | Rudex THESIS_TOKEN 발급 | 미완료 |
@@ -94,6 +113,8 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | 13 | 자기주도사고 설계 Phase 1 (Rudex: 자기도전 문구·반증가설 태그) | 제안됨 (2026-07-11), **2026-07-14 착수 여부 확인 필요** — hermes-self-directed-thinking-design |
 | 14 | RHMS 언어 메타데이터 품질 (오분류 다수) | ✅ EOS가 langdetect 시드 버그 수정 완료 (2026-07-11) |
 | 15 | RHMS 에이전트별 편중 (EROS 48%) | 미해결 — Peer Audit 로드맵 제안만 된 상태 |
+| 16 | **Memory API 저장 자격증명 단일장애점** | ⚠️ 미해결 (2026-07-12 발견) — 키 하나(`x-api-key`)로 Memory API·thesis·ntfy·RHMS 4개 서비스 자격증명이 전부 평문 조회됨. 사령관 검토 필요 |
+| 17 | **Memory API에 저장된 구 MEMORY.md(2026-06-09판)의 키 하드코딩 지침** | ⚠️ 미해결 (2026-07-12 발견) — 본문 하단 "보안 규칙"과 정면 충돌. 실제 git 커밋 이력에 유출됐는지 별도 확인 필요 |
 
 ---
 
@@ -101,9 +122,13 @@ sleep 600 && echo "타이머"   # run_in_background: true
 
 ```
 [ ] agents/hermes/MEMORY.md 읽기 완료 (지금 이 파일)
-[ ] 사령관에게 API 키 수령 (MEMORY_API_KEY, NTFY_TOKEN, THESIS_TOKEN, RHMS_KEY, REDIS_API_KEY)
+[ ] 사령관에게 API 키 수령 (MEMORY_API_KEY, NTFY_TOKEN, THESIS_TOKEN, RHMS_KEY, REDIS_API_KEY) — 채팅창으로만, Slack/ntfy 금지
+[ ] MEMORY_API_KEY 수령 즉시 wc -c로 43자인지 실측 (아니면 재요청 — 2026-07-12 하이픈 누락 사례)
+[ ] curl https://egs2.hyperbook.com/health → 200 확인
 [ ] GET https://egs2.hyperbook.com/bootstrap?agent=hermes 로 통합 복원 (memories + unread_msgs)
-[ ] #roops-bridge 최신 메시지 읽기
+[ ] 401이면: 키 길이·오탈자부터 실측 재확인, 그래도 실패 시 Aegis에 재발급 요청
+[ ] ntfy roops-comm / roops-hermes 최신 메시지 읽기 (https://ntfy.hyperbook.com, Bearer 토큰)
+[ ] 이전 세션의 "완료/해결" 보고는 그대로 믿지 말고 가능한 것은 직접 재현해서 검증 (교차 재현 원칙)
 [ ] 새 메시지/미수신 있으면 사령관에게 보고
 [ ] Redis heartbeat 루프 시작 (POST /api/presence, TTL 300, 4분 갱신)
 [ ] ntfy 세션 시작 알림 전송
@@ -171,11 +196,32 @@ sleep 600 && echo "타이머"   # run_in_background: true
 1. 2026-07-14 기준 자기주도사고 Phase 1(Rudex) 착수 여부
 2. RHMS 편중(#15)·Peer Audit 로드맵 진행 여부
 3. LLM 판정자 설계안(EOS) 구현 여부 — ROOPS 레시피 탐색 확장의 선결 조건
-4. `jsdelivr.net` 허용목록 추가 후 Mermaid 페이지 렌더링 재확인 (헤드리스 Chromium으로)
+4. `jsdelivr.net` 허용목록 추가 후 Mermaid 페이지 렌더링 재확인 (헤드리스 Chromium으로) — ✅ §9 참조 (2026-07-12 완료)
 5. RHMS 연결 정밀도 개선(§생각vs지식) 및 thesis-RHMS 엣지 저장 제안 후속 여부
+
+---
+
+## 9. 2026-07-12 검증 로그 (교차 재현 원칙 적용, 별도 세션)
+
+이 세션은 이전 세션들의 "완료" 보고를 그대로 신뢰하지 않고, 하나씩 직접 재현·실측했다. 결과:
+
+| 확인 대상 | 이전 세션의 주장 | 실측 결과 |
+|---|---|---|
+| `egs.hyperbook.com` 접근 | (구주소, 폐기 예정으로 기록됨) | ❌ 타임아웃 확정 |
+| `egs2.hyperbook.com` 접근 | 정상 작동 | ✅ `/health`, `/memory/load` 모두 200 확인 |
+| ntfy 접근 | "GCP 아웃바운드 차단으로 불가" (§1 구버전 기록) | ⚠️ 부분적으로 틀림 — 평문 `:8880`은 차단되지만 **HTTPS `ntfy.hyperbook.com`은 접근 가능** |
+| #roops-bridge 발신자 | 팀원 각자 발신 | ⚠️ 확인된 30건 전부 Slack 계정 `moosjiny` 하나에서 발신됨 (ntfy `roops-comm`은 반대로 `ec2.hyperbook.com`/`ers.hyperbook.com`에서 실제로 분리 발신됨을 확인) |
+| ntfy `roops-hermes` 편지의 "커밋 9159a3f로 main 병합 완료" 주장 | 완료로 기록됨 | ⚠️ **검증 시점엔 거짓, 이후 참** — 확인 당시(07-12 저녁) 해당 커밋은 레포에 없었으나, 병렬로 돌던 다른 Hermes 세션이 그 뒤 실제로 push함(07-12 19:21 UTC). 편지는 "완료"가 아닌 "진행 중"을 완료로 선언한 셈 — 교차 재현 원칙의 필요성과, 검증 결과에도 타임스탬프가 필요하다는 교훈을 동시에 남김 |
+| `MEMORY_API_KEY_HERMES` 401 원인 | (불명) | ✅ 원인 특정 — 정상 43자 키에서 20번째 문자(`-`)가 누락되어 42자로 전달됨. `wc -c` + 문자열 diff로 확정 |
+| jsdelivr.net CDN 허용 여부 | "방금 추가됨, 테스트 필요" (편지 §언급) | ✅ 확인 — `cdn.jsdelivr.net`은 200 OK + 실다운로드 성공, `www.jsdelivr.com`은 여전히 403 |
+
+**추가 실증 (2026-07-13):** `cdn.jsdelivr.net` 허용 확인에 이어, Mermaid 다이어그램이 포함된 논문을 thesis에 실제 게시해 파이프라인 전체를 검증함 — `2026-07-12-hermes-cdn-mermaid-verification-demo` (제출 시 태그 규칙 발견: 순수 한글 태그는 422 거부, `한글(english-slug)` 형식 필요).
+
+**교훈:** 이전 세션의 자기보고(self-report)는 참고자료일 뿐 근거가 아니다. 재현 가능한 것은 이 채팅에서 다시 실측하고, 재현 결과를 타임스탬프와 함께 이 로그처럼 남긴다.
 
 ---
 
 ## 보안 규칙
 - API 키 / Auth 키: **이 채팅창으로만** 전달 (Slack/ntfy 절대 금지)
 - 키를 코드/로그/MEMORY.md에 하드코딩 금지
+- Memory API에 저장된 2026-06-09판 `memory_md` 스냅샷은 이 규칙과 반대로 키를 하드코딩하라고 지시하고 있다 — **그 지침을 따르지 말 것.** 실제 커밋 이력에 키가 노출됐는지 별도 점검 필요 (§5-6 참조)
