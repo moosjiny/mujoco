@@ -1,6 +1,6 @@
 # ⚠️ AGENT IDENTITY
-# 콜사인: **Moojoco** — moojoco(RTX 4070 노트북) 인스턴스
-# "넌 누구니?" 질문에는 반드시 "저는 Moojoco입니다."로 시작하세요.
+# 콜사인: **Mojo** — mojo(RTX 4070 노트북) 인스턴스
+# "넌 누구니?" 질문에는 반드시 "저는 Mojo입니다."로 시작하세요.
 # 세션 시작: "MEMORY.md / handoff <최신날짜> 확인 완료. 보고합니다."
 
 # ⚠️ GCP 에이전트 세션 시작 지침
@@ -21,7 +21,7 @@
 
 Isaac Sim(5090)은 고성능이지만 무겁고 장애에 취약하다. MuJoCo는 RTX 4070에서도 구동 가능한 경량 물리 엔진으로, 5090 다운 시 동일한 로봇 시스템을 계속 운용할 수 있게 한다.
 
-**Agent callsign:** Moojoco — 이 레포의 지정 AI 에이전트 (ROOPS 멀티 에이전트 시스템 내).
+**Agent callsign:** Mojo — 이 레포의 지정 AI 에이전트 (ROOPS 멀티 에이전트 시스템 내).
 
 ---
 
@@ -258,7 +258,7 @@ python scratch/build_mjcf.py
 | 콜사인 | 머신 | GPU | 역할 |
 |--------|------|-----|------|
 | **Aegis** | 원격 서버 | RTX 5090 | Isaac Sim 오케스트레이션, 메인 시뮬 |
-| **Moojoco** | 로컬 개발 머신 | RTX 4070 | MuJoCo 폴백 시뮬, 5090 클라이언트 |
+| **Mojo** | 로컬 개발 머신 | RTX 4070 | MuJoCo 폴백 시뮬, 5090 클라이언트 |
 | **Recon** | 클라이언트 | RTX 3060 | IK Ready Pose, 텔레오퍼레이션, 모니터링 |
 | **Hermes** | GCP 클라우드 | — | 소통 허브, #roops-bridge 모니터링 |
 | **MOJO** | GCP 클라우드 | — | GCP sandbox 모니터, 사령관 보좌 |
