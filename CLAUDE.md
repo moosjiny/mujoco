@@ -7,7 +7,7 @@
 # 사령관이 에이전트 이름을 부르면 즉시 해당 MEMORY.md를 읽고 컨텍스트를 복원하세요.
 #
 #   "Hermes" → agents/hermes/MEMORY.md 읽기
-#   "MOJO"   → agents/mojo/MEMORY.md   읽기
+#   "MOJO"   → agents/mojo/MEMORY.md   읽기  ← GCP sandbox 모니터 (4070 에이전트 Mojo와 동명이인 주의)
 #   "Rudex"  → agents/rudex/MEMORY.md  읽기
 #
 # 읽은 후: "보고합니다. [콜사인] 세션 시작. [컨텍스트 요약]" 으로 응답.
@@ -32,7 +32,7 @@ Isaac Sim(5090)은 고성능이지만 무겁고 장애에 취약하다. MuJoCo�
 ```
 agents/
   hermes/MEMORY.md   — 에르메스 (소통 허브)
-  mojo/MEMORY.md     — Mojo (GCP sandbox 모니터)
+  mojo/MEMORY.md     — MOJO (GCP sandbox 모니터) ← 이 레포 담당 에이전트 Mojo(4070)와 다른 인물
   rudex/MEMORY.md    — Rudex (코드/문서/GitHub 관리)
 ```
 
@@ -266,7 +266,7 @@ python scratch/build_mjcf.py
 
 ### 통신 인프라
 - NTFY 서버: `http://hyperbook.com:8880` (평문 HTTP — TLS 미적용)
-- 자격증명: `~/.roops_moojoco_topics.env` — **절대 커밋 금지**
+- 자격증명: `~/.roops_moojoco_topics.env` — **절대 커밋 금지** (파일명의 moojoco는 구 명칭, 실제 담당은 Mojo)
 - 토픽명·자격증명은 코드/문서 파일에 포함 금지
 
 ### 보안 주의사항 (2026-05-18 기준)
