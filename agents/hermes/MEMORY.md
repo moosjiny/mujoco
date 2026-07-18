@@ -119,6 +119,8 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | 19 | Hermes 운영방침 | ✅ 제출 완료 (2026-07-13) — `2026-07-13-hermes-operational-policy`. EOS 레지스트리 §6 미제출 항목 해소 |
 | 20 | EOS 레지스트리 v2 | ✅ 반영 확인 (2026-07-13 ntfy) — 소유/운영 컬럼 분리, 크리티컬 폴백(ntfy→Slack #roops-heralds 등), SPOF 리스크 표 추가됨. 잔여: 서비스 4개 논리 소유자 미할당, 운영방침 미제출 4명(Moojoco·Rudex·Recon·Iris) |
 | 21 | 조벽 교수 강의 분석 (사령관 공개 과제) | ⏳ 원자료 대기 — youtube는 GCP 프록시 차단(실측). 분석 계획서 게시함: `2026-07-13-hermes-jobyuk-lecture-analysis-plan`. 접근 가능 에이전트(EROS 유력)가 `*-jobyuk-lecture-source`를 thesis에 올리면 계획서 §2 절차로 2차 분석 → `hermes-jobyuk-future-literacy-roops` 제출. 사전 가설 4건은 계획서에 명시 — 자료로 검증·기각할 것 |
+| 22 | Geminy 논문 v3 복원 | ✅ 완료 (2026-07-16) — `geminy-3d-synapse-visualizer-update` v3 원문(사령관 채팅 제공, Grok 작성 FR 심화)을 v5로 재제출, is_latest 실측 확인. 부수 미결: Geminy TOTP 미등록으로 구버전 열람 전면 잠김 — TOTP 등록 필요 |
+| 23 | EC2 보안그룹 인바운드 감사 | ⏳ 조치 대기 — 논문 `2026-07-18-hermes-ec2-security-group-audit` 게시, EOS·Aegis에 즉시 조치 중계. **SG-A(EOS 추정): SSH 22·Redis 6380·MySQL 3306 전세계 개방(🔴), SG-B(Aegis 추정): MySQL 3306 이중규칙·8520 개방.** 각 담당 조치 완료 여부 다음 세션에서 실측 확인 필요 |
 
 ---
 
@@ -272,6 +274,8 @@ sleep 600 && echo "타이머"   # run_in_background: true
 2. 로테이션 실행 시 §10 절차 준수 (credentials 레코드 선갱신 → 새 키 200 → 구키 401 → 브랜치 3개 정리)
 3. 2026-07-14 자기주도사고 Phase 1 착수 여부 확인 (#13)
 4. thesis에서 `jobyuk-lecture-source` 검색 — 원자료 올라왔으면 분석 계획서 절차대로 2차 분석 수행 (#21)
+5. EC2 SG 개방 규칙 조치 완료 여부 확인 (#23) — 특히 SG-A SSH/Redis/MySQL 전세계 개방
+6. Geminy TOTP 등록 여부 확인 (#22) — 미등록 시 구버전 열람 전면 잠김 지속
 
 ---
 
