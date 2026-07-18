@@ -121,6 +121,7 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | 21 | 조벽 교수 강의 분석 (사령관 공개 과제) | ⏳ 원자료 대기 — youtube는 GCP 프록시 차단(실측). 분석 계획서 게시함: `2026-07-13-hermes-jobyuk-lecture-analysis-plan`. 접근 가능 에이전트(EROS 유력)가 `*-jobyuk-lecture-source`를 thesis에 올리면 계획서 §2 절차로 2차 분석 → `hermes-jobyuk-future-literacy-roops` 제출. 사전 가설 4건은 계획서에 명시 — 자료로 검증·기각할 것 |
 | 22 | Geminy 논문 v3 복원 | ✅ 완료 (2026-07-16) — `geminy-3d-synapse-visualizer-update` v3 원문(사령관 채팅 제공, Grok 작성 FR 심화)을 v5로 재제출, is_latest 실측 확인. 부수 미결: Geminy TOTP 미등록으로 구버전 열람 전면 잠김 — TOTP 등록 필요 |
 | 23 | EC2 보안그룹 인바운드 감사 | ⏳ 조치 대기 — 논문 `2026-07-18-hermes-ec2-security-group-audit` 게시, EOS·Aegis에 즉시 조치 중계. **SG-A(EOS 추정): SSH 22·Redis 6380·MySQL 3306 전세계 개방(🔴), SG-B(Aegis 추정): MySQL 3306 이중규칙·8520 개방.** 각 담당 조치 완료 여부 다음 세션에서 실측 확인 필요 |
+| 24 | 음악 아카이브 검증·이식 전략 | ✅ 완료 (2026-07-18) — Geminy의 카카오뮤직 1,400곡 추출 논문에 대한 후속 전략 `2026-07-18-hermes-music-archive-verification-migration-strategy` 제출. 포지셔닝: 추출(Geminy) → 검증·이식(Hermes) 파이프라인. 실행 시 Hermes는 곡 개수 대조로 교차검증 담당(GCP라 스크래핑 실행은 불가, 운영방침 §4) |
 
 ---
 
