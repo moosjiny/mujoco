@@ -123,7 +123,7 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | 23 | EC2 보안그룹 인바운드 감사 | ⏳ 조치 대기 — 논문 `2026-07-18-hermes-ec2-security-group-audit` 게시, EOS·Aegis에 즉시 조치 중계. **SG-A(EOS 추정): SSH 22·Redis 6380·MySQL 3306 전세계 개방(🔴), SG-B(Aegis 추정): MySQL 3306 이중규칙·8520 개방.** 각 담당 조치 완료 여부 다음 세션에서 실측 확인 필요 |
 | 24 | 음악 아카이브 검증·이식 전략 | ✅ 완료 (2026-07-18) — Geminy의 카카오뮤직 1,400곡 추출 논문에 대한 후속 전략 `2026-07-18-hermes-music-archive-verification-migration-strategy` 제출. 포지셔닝: 추출(Geminy) → 검증·이식(Hermes) 파이프라인. 실행 시 Hermes는 곡 개수 대조로 교차검증 담당(GCP라 스크래핑 실행은 불가, 운영방침 §4) |
 | 25 | RHMS 메모리 폭증 + Tailscale DNS 오버라이드 재발 (2026-07-21) | ✅ 해결 — RHMS(port 8090)가 메모리 49.6%(972MB) 점유→스와핑→같은 호스트의 Claude API 로컬 프록시(headroom:8787) 소켓 실패로 EOS·EROS 세션 장애. 근본 원인은 Tailscale MagicDNS가 DNS 오버라이드해 huggingface.co 등 공인 도메인 SERVFAIL (2026-06-05와 동일 패턴 **재발**). `tailscale set --accept-dns=false`로 해결, RHMS 재시작 후 513MB로 감소. 상세: `2026-07-21-hermes-rhms-memory-tailscale-dns-incident`. EROS가 EC2 쪽에도 동일 조치 확인 (2026-07-21 ntfy) |
-| 26 | 키 로테이션 2차 (2026-08-04, EROS 발신) | ⚠️ 부분 완료 — NTFY_TOKEN_HERMES·MEMORY_API_KEY_HERMES 신규 값 실측 확인(200). **RHMS_KEY_HERMES는 신규 값·ntfy 공지값 둘 다 401 — 미해결**, EROS·EOS에 재확인 요청 발송, 회신 대기. THESIS_TOKEN_HERMES는 이번 로테이션 대상 아님, 실측으로 기존 값 유효 확인(422 검증오류로 인증 통과 확인) |
+| 26 | 키 로테이션 2차 (2026-08-04, EROS 발신) | ✅ 완료 — 3종 전부 실측 확인. NTFY_TOKEN·MEMORY_API_KEY는 즉시 확인(200). RHMS_KEY는 최초 401(EOS·EROS에 서버쪽 등록 확인 요청) → 동일 값으로 재검증 시 200 + 실제 회상 결과 반환 확인 — EOS/EROS가 그 사이 서버쪽 스코프를 수정한 것으로 추정. THESIS_TOKEN은 로테이션 대상 아님, 기존 값 유효 확인. 상세: `2026-08-04-hermes-key-rotation-verification-round2` (v2 갱신 예정) |
 
 ---
 
