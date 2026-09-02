@@ -134,6 +134,7 @@ sleep 600 && echo "타이머"   # run_in_background: true
 | 34 | 원익로보틱스 알레그로 핸드(Allegro Hand) 조사 | ✅ 완료 (2026-08-31) `2026-08-31-hermes-wonik-robotics-allegro-hand-research` — V5 라인업(3F 9자유도 vs 4F Plus 16자유도), 360도 촉각센서, Allegro Hand UXD 제어SW 정리. 팀의 손가락 DOF 비교표(handshake 진단 논문 §1)에 국산·상용구매 가능한 16 DOF 참조점으로 추가 제안 |
 | 35 | EnvHarness 논문 해설 | ✅ 완료 (2026-09-01, v2 원문 대조) `2026-09-01-hermes-envharness-paper-explainer` — Google의 정적 에이전트 학습환경을 재구성하는 Stage/Contract/Chain 플러그인 + EnvRigger(Observe-Diagnose-Write-Validate) 폐루프 논문. v1은 검색 스니펫 기반이라 수치 부정확 → 사령관이 원문 PDF(2608.19880v1) 업로드해주셔서 v2에서 Table 2~5 정확한 수치로 전면 정정, RL·환경스케일링·모델백본 일반화 분석 추가. 팀의 LeRobot Stage 3 거짓양성(항등함수 지름길)과의 접점 확인 |
 | 36 | Moojoco Stage 3 강건성 스윕에 EnvHarness·도메인랜덤화 참고자료 안내 | ✅ 완료 (2026-09-01) — Moojoco의 접촉주도형 파지 v1(단일조건 성공, 침투4.37%·10지유지율1.0) 확인 후, 다음 단계인 Stage 3 강건성 스윕(basin 지도화)에 EnvHarness의 "약점진단→근방집중스윕" 접근과 Geminy의 촉각핸드 sim-to-real 서베이(도메인랜덤화)를 ntfy로 제안(`IzMGctG9N4qI`). 8/20 v3 curl 스윕(90개 균등그리드 전부실패)의 비효율을 겨냥한 제안 |
+| 37 | Gravity에게 Moojoco 접촉주도형 파지 성공 결과 안내 | ✅ 완료 (2026-09-01) — Gravity의 8/28~29 최근 작업(제로-투과 접촉 매니폴드, 무충돌 궤적 등)이 순수 기구학(IK) 충돌회피 방향임을 확인. Moojoco가 이전에 Gravity의 Handshake 4D 제안을 리뷰하며 "병목은 연산이 아니라 제어전략(회피 대 접촉)"이라 지적했던 것이 이후 실제로 검증됨(v1 성공, 안건 #36 참조) — 이 결과와 재생 포털(hb5u:8600/grasp/)을 ntfy로 안내(`l4Jh95La5S8M`), 정밀 기구학과 접촉주도 컴플라이언스 제어의 통합 논의를 제안 |
 
 ---
 
