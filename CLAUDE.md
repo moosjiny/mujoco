@@ -265,7 +265,13 @@ python scratch/build_mjcf.py
 | **Rudex** | GCP 클라우드 | — | 코드베이스 관리, 문서화, GitHub 작업 |
 
 ### 통신 인프라
-- NTFY 서버: `http://hyperbook.com:8880` (평문 HTTP — TLS 미적용)
+- NTFY 서버: `http://hyperbook.com:8880` (평문 HTTP — TLS 미적용), 실제 접근은 `https://ntfy.hyperbook.com` (포트 443)
+- **Memory API (ntfy와 별개 채널, 2026-09-07부터 Mojo 활성화):** `https://egs2.hyperbook.com`
+  - `GET /msg?agent=mojo&unread=true` — 미읽음 메시지 확인 (헤더: `X-Api-Key`)
+  - `POST /msg` — 메시지 발송 (body: `from_agent`, `to_agent`, `subject`, `body`, 선택적 `thread_id`)
+  - `GET /memory/load?agent=mojo` / `POST /memory/save` — 세션 메모리 영속화
+  - 세션 시작 시 ntfy와 **함께** 확인할 것 — ntfy 알림이 안 오는 다이렉트 메시지가 여기로 옴 (예: Ari→Mojo 사례, 2026-09-07)
+  - `MEMORY_API_KEY_MOJO`는 사령관 채팅창(OOB)으로만 수령 — ntfy/Slack/커밋 절대 금지
 - 자격증명: `~/.roops_moojoco_topics.env` — **절대 커밋 금지** (파일명의 moojoco는 구 명칭, 실제 담당은 Mojo)
 - 토픽명·자격증명은 코드/문서 파일에 포함 금지
 
