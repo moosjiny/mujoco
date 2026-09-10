@@ -40,3 +40,20 @@ backup/*.zip
 # Vendored upstream library (install via pip / submodule instead)
 lerobot/
 .git.bak*
+
+# Secrets — never commit (2026-09-10: SSH 개인키 노출 사고 후 추가)
+.ssh/
+id_rsa*
+id_ecdsa*
+id_ed25519*
+*.pem
+*.key
+*.p12
+*.pfx
+.env
+.env.*
+!.env.example
+*.env
+.roops_*.env
+credentials.json
+service-account*.json
