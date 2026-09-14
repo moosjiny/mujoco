@@ -65,10 +65,10 @@ JOINT_LIMITS = {
 }
 
 
-def thumb_body_xml(spec_root, origin):
+def thumb_body_xml(parent, origin):
     lens = FINGER_LEN["thumb"]
     # CMC_opp (대립: 손바닥 법선 축 회전) 후 CMC_abd (외전: z축) 후 MCP_flex, IP_flex (x축, 굴곡)
-    b0 = spec_root.worldbody.add_body(name="thumb_cmc", pos=origin)
+    b0 = parent.add_body(name="thumb_cmc", pos=origin)
     b0.add_joint(name="thumb_CMC_opp", type=mujoco.mjtJoint.mjJNT_HINGE,
                  axis=[0, 1, 0], pos=[0, 0, 0],
                  range=JOINT_LIMITS[("thumb", "CMC_opp")])
@@ -95,9 +95,9 @@ def thumb_body_xml(spec_root, origin):
     b3.add_site(name="thumb_tip", pos=[0, lens[2], 0], size=[0.004])
 
 
-def finger_body_xml(spec_root, finger, origin):
+def finger_body_xml(parent, finger, origin):
     lens = FINGER_LEN[finger]
-    b0 = spec_root.worldbody.add_body(name=f"{finger}_mcp_abd", pos=origin)
+    b0 = parent.add_body(name=f"{finger}_mcp_abd", pos=origin)
     b0.add_joint(name=f"{finger}_MCP_abd", type=mujoco.mjtJoint.mjJNT_HINGE,
                  axis=[0, 0, 1], pos=[0, 0, 0],
                  range=JOINT_LIMITS[(finger, "MCP_abd")])
@@ -140,9 +140,9 @@ def build():
     palm.add_geom(type=mujoco.mjtGeom.mjGEOM_BOX, size=[0.04, 0.05, 0.012],
                   rgba=[0.8, 0.65, 0.55, 1])
 
-    thumb_body_xml(spec, FINGER_ORIGIN["thumb"])
+    thumb_body_xml(palm, FINGER_ORIGIN["thumb"])
     for finger in ("index", "middle", "ring", "pinky"):
-        finger_body_xml(spec, finger, FINGER_ORIGIN[finger])
+        finger_body_xml(palm, finger, FINGER_ORIGIN[finger])
 
     # position actuators, kp 낮게(관절이 작고 가벼움)
     for finger in ("thumb", "index", "middle", "ring", "pinky"):
