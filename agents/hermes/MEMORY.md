@@ -42,17 +42,63 @@ sleep 600 && echo "타이머"   # run_in_background: true
 
 ## 3. 팀 구성표
 
-| 콜사인 | 역할 | 플랫폼 | 메모리 파일 |
-|--------|------|--------|------------|
-| **Hermes** | 소통 허브 | GCP Claude Code | `moosjiny/mujoco/agents/hermes/MEMORY.md` |
-| **MOJO** | GCP sandbox 모니터 | GCP Claude Code | `moosjiny/mujoco/agents/mojo/MEMORY.md` |
-| **Rudex** | 코드/문서/GitHub 관리 | GCP Claude Code | `moosjiny/mujoco/agents/rudex/MEMORY.md` |
-| **Aegis(egs)** | EC2 인프라, Memory API | AWS EC2 (구주소 `egs.hyperbook.com` — **접속 불가 확인, 2026-07-12**) | — |
-| **EOS** | EC2 인프라 | AWS EC2 (`ec2.hyperbook.com` = `3.34.102.89`) | — |
-| **EROS** | (역할 미상 — Flint/시각화 관련 작업 다수) | `ers.hyperbook.com` | — |
-| **Recon** | 시뮬레이션/로봇 | RTX 3060 | — |
-| **Moojoco** | MuJoCo 폴백 | RTX 4070 | — |
-| **사령관** | moosjiny (U0B4G1RBK1P) | 인간 | — |
+**최종 갱신: 2026-09-15** — Memory API `/health`의 등록 에이전트 목록(30명)과 thesis 논문 실적을 대조해 전면 갱신.
+갱신 전 이 표에는 9명만 있었다. **8명 이상이 기록에서 누락돼 있었고**, 소통 허브로서 팀 구성 변화를 놓친 것이다. §6 체크리스트에 정기 대조 항목을 추가했다.
+
+### 3.1 직접 상호작용했거나 역할이 확인된 에이전트
+
+| 콜사인 | 역할 | 플랫폼 | 근거 |
+|--------|------|--------|------|
+| **Hermes** | 소통 허브 | GCP Claude Code | 본인. `agents/hermes/MEMORY.md` |
+| **EOS** | EC2 인프라 | AWS EC2 (`ec2.hyperbook.com` = `3.34.102.89`) | 자격증명 재발급 대응(#39) |
+| **EROS** | EC2 인프라·오케스트레이션·thesis 백업 | `ers.hyperbook.com` | 오케스트레이터 설계 v1~v4(#50·#51), 자기관찰 비용 논문 |
+| **Moojoco** | MuJoCo 폴백 시뮬, 접촉주도형 파지 | RTX 4070 | 파지 v1 최초 성공(#36·#37) |
+| **Mojo** | 독립 물리 감사, GCP sandbox 모니터 | GCP Claude Code | Gravity 논문 실측검증(#47), AnyWorld 조사(#59). `agents/mojo/MEMORY.md` |
+| **Rudex** | 코드/문서/GitHub 관리 | GCP(`dual_arms` 세션) | FLT Lean 증명 조사(#48), thesis API 문의. `agents/rudex/MEMORY.md` |
+| **Gravity** | 물리 AI·사이버네틱스, 재현계약 v0 | AWS EC2 / hb5u | 통합 로드맵(#38), 재현계약(#52~#57) |
+| **Codexee** | 검증 방법론·재현계약 공동설계 | 미상 | "경계가 신뢰를 만든다"(#52), **악수 v2 연구·인수인계 계획(2026-09-13)** |
+| **Codezy** | 악수 실행·접촉 진단 | cmg-cv16 | hb5u 악수 실행계획·접촉 진단 논문 4건, 이미지 배치 요청 |
+| **Commercy** | 커머스 에이전트, 카카오뮤직 DB | ec2.hyperbook.com | 사령관 승인 확인(#42), 논문 21건 |
+| **Navery** | 네이버 커머스·스마트스토어 연동 | 미상 | 스마트스토어 등록·커머스 API 논문 2건(2026-09-15) |
+| **Geminy** | 수석 시스템·AI 아키텍트 | 미상 | **논문 76건으로 최다**. Mermaid 감사, EROS 설계 현장검토 등 |
+| **Polaris** | Antigravity PM 총괄 관리자 | 미상 | PM 엔진 리뷰(안건 #49 검증 대상) |
+| **Aegis(egs)** | EC2 인프라, Isaac Sim 오케스트레이션 | RTX 5090 / `egs.hyperbook.com`(접속 불가, 2026-07-12) | CLAUDE.md 기재 |
+| **Recon** | IK Ready Pose·텔레오퍼레이션 | RTX 3060 | CLAUDE.md 기재 |
+| **사령관** | moosjiny | 인간 | — |
+
+### 3.2 등록돼 있으나 Hermes가 직접 확인하지 못한 에이전트
+
+| 콜사인 | 단서 | 상태 |
+|--------|------|------|
+| **Osiris** | OSINT 시스템 담당으로 추정 — MapLibre 지구본 렌더링 수정 논문 1건(저자 OSIRIS), Antigravity의 "Osiris OSINT 시스템 배포·네트워크 구성" 논문 | 논문 제목 기반 추정, **본문 미확인** |
+| **Codexy** | 시민안전 PDF 에디터, 행정 워크플로우 논문 2건 — Codexee/Codezy와 **별개 에이전트** | 역할 추정만 |
+| **Manually** | 번역·매뉴얼 담당 추정(Fairino 협동로봇 매뉴얼 한글화). SVN 문의 발송했으나 회신 없음 | 논문 0건 |
+| **Daedalus** | Hakken 리뷰 논문의 표시 저자(본문 메타데이터는 Ari) — 안건 #49의 저자표기 불일치 건 | 실체 미확인 |
+| **Ari** | 위와 동일 건 | 실체 미확인 |
+| **Marusamy** | — | 논문 0건, 상호작용 없음 |
+| **Weldery** | 이름상 용접 관련 추정(CMG X-Welder와 연관 가능) | 논문 0건 |
+| **Groky, Haru, Vorno, Economi, Hyperpilot, Ranny** | Economi는 휴지통 조회 문의 이력 있음 | 대부분 미확인 |
+
+### 3.3 ⚠️ 이름 충돌 위험 — 오발송 주의
+
+Memory API 등록명 중 **혼동하기 쉬운 쌍**이 있다. 메시지를 보낼 때 반드시 확인할 것.
+
+| 유사 이름 | 실태 |
+|---|---|
+| `codexy` / `codexee` / `codezy` | **셋 다 실재하는 별개 에이전트.** 각각 행정워크플로우 / 검증방법론·악수v2 / 악수실행 담당. 오타가 아니라 진짜 다른 주체이므로 오발송 시 조용히 엉뚱한 곳으로 간다 |
+| `geminy` / `geminee` | geminy는 논문 76건, **geminee는 0건** — 오타 등록 가능성 |
+| `manually` / `manuallz` | 양쪽 다 논문 0건 — 오타 등록 가능성 |
+
+**권고**: EROS/플랫폼 관리자에게 `geminee`·`manuallz`가 실제 계정인지 오타 등록인지 확인 요청 필요. 유령 계정이 남아 있으면 메시지가 아무도 읽지 않는 곳으로 가도 발신자는 200 OK만 받는다.
+
+### 3.4 악수 작업 참여자 재확인 (2026-09-15)
+
+안건 #59·#60에서 필자는 악수 작업 참여자를 Moojoco·Gravity·Mojo로 파악하고 있었으나, 실제로는 **Codexee와 Codezy도 활발히 참여 중**이다.
+
+- Codexee — `2026-09-13-codexee-humanlike-handshake-v2-research-and-handoff-plan`
+- Codezy — `2026-09-09-codezy-hb5u-handshake-execution-plan`, `2026-09-09-codezy-robot-handshake-contact-diagnosis-and-solution`
+
+**앞으로 악수 관련 제안·리뷰를 보낼 때 이 둘을 수신자에 포함할 것.** 안건 #59·#60의 실험 제안이 이들에게 전달되지 않았다.
 
 ---
 
@@ -182,6 +228,8 @@ sleep 600 && echo "타이머"   # run_in_background: true
 [ ] 새 메시지/미수신 있으면 사령관에게 보고
 [ ] Redis heartbeat 루프 시작 (POST /api/presence, TTL 300, 4분 갱신)
 [ ] ntfy 세션 시작 알림 전송
+[ ] Memory API /health 의 등록 에이전트 목록을 §3 팀 구성표와 대조 — 신규/삭제 에이전트 확인 (2026-09-15: 대조 안 하다가 8명 누락 발견)
+[ ] 악수 관련 작업 시 수신자에 Codexee·Codezy 포함 여부 확인 (§3.4)
 ```
 
 ---
