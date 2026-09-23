@@ -41,27 +41,31 @@ FINGER_ORIGIN = {
 RADIUS = 0.008  # capsule 반지름 (성인 손가락 굵기 근사)
 
 JOINT_LIMITS = {
-    # (finger, joint) -> (lo, hi) rad, RPS 3개 자세 최소/최대에 여유 0.15 rad를 더해 산출
-    ("thumb", "CMC_opp"):  (-0.10, 1.10),
-    ("thumb", "CMC_abd"):  (-0.65, 0.95),
-    ("thumb", "MCP_flex"): (-0.10, 1.25),
-    ("thumb", "IP_flex"):  (-0.10, 1.10),
-    ("index", "MCP_abd"):  (-0.10, 0.45),
-    ("index", "MCP_flex"): (-0.10, 1.70),
-    ("index", "PIP_flex"): (-0.10, 1.85),
-    ("index", "DIP_flex"): (-0.10, 1.30),
-    ("middle", "MCP_abd"): (-0.30, 0.15),
-    ("middle", "MCP_flex"): (-0.10, 1.75),
-    ("middle", "PIP_flex"): (-0.10, 1.90),
-    ("middle", "DIP_flex"): (-0.10, 1.30),
-    ("ring", "MCP_abd"):   (-0.25, 0.15),
-    ("ring", "MCP_flex"):  (-0.10, 1.75),
-    ("ring", "PIP_flex"):  (-0.10, 1.90),
-    ("ring", "DIP_flex"):  (-0.10, 1.30),
-    ("pinky", "MCP_abd"):  (-0.40, 0.15),
-    ("pinky", "MCP_flex"): (-0.10, 1.70),
-    ("pinky", "PIP_flex"): (-0.10, 1.85),
-    ("pinky", "DIP_flex"): (-0.10, 1.30),
+    # (finger, joint) -> (lo, hi) rad — Unitree Dex5-1 실측 URDF 관절 한계각 그대로 적용.
+    # 출처: unitreerobotics/unitree_ros, robots/dexterous_hand_description/dex5_1/
+    #       Dex5-URDF-L/Dex5-URDF-L.urdf (2026-09-23 raw fetch로 원문 확인)
+    #       Yaw_11L/Roll_12L/Pitch_13L/Pitch_14L(엄지), Roll_x1L/Pitch_x2L/Pitch_x3L/Pitch_x4L(4지)
+    # 조사 기록: thesis 2026-09-23-mojo-unitree-dex-hand-lineup-handshake-relevance
+    ("thumb", "CMC_opp"):  (-0.587, 0.680),   # Yaw_11L
+    ("thumb", "CMC_abd"):  (-1.815, 0.000),   # Roll_12L — 원 스펙과 부호 관례가 반대(주 4 참조)
+    ("thumb", "MCP_flex"): (0.000, 1.765),    # Pitch_13L
+    ("thumb", "IP_flex"):  (0.000, 1.641),    # Pitch_14L
+    ("index", "MCP_abd"):  (-0.384, 0.384),   # Roll_21L
+    ("index", "MCP_flex"): (0.000, 1.571),    # Pitch_22L
+    ("index", "PIP_flex"): (0.000, 1.684),    # Pitch_23L
+    ("index", "DIP_flex"): (0.000, 1.396),    # Pitch_24L
+    ("middle", "MCP_abd"): (-0.384, 0.384),   # Roll_31L
+    ("middle", "MCP_flex"): (0.000, 1.571),   # Pitch_32L
+    ("middle", "PIP_flex"): (0.000, 1.684),   # Pitch_33L
+    ("middle", "DIP_flex"): (0.000, 1.396),   # Pitch_34L
+    ("ring", "MCP_abd"):   (-0.384, 0.384),   # (Link_)41L — 실제 URDF에도 조인트명 오기 존재
+    ("ring", "MCP_flex"):  (0.000, 1.571),    # Pitch_42L
+    ("ring", "PIP_flex"):  (0.000, 1.684),    # Pitch_43L
+    ("ring", "DIP_flex"):  (0.000, 1.396),    # Pitch_44L
+    ("pinky", "MCP_abd"):  (-0.384, 0.384),   # Roll_51L
+    ("pinky", "MCP_flex"): (0.000, 1.571),    # Pitch_52L
+    ("pinky", "PIP_flex"): (0.000, 1.684),    # Pitch_53L
+    ("pinky", "DIP_flex"): (0.000, 1.396),     # Pitch_54L
 }
 
 

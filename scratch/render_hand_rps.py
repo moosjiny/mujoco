@@ -8,6 +8,7 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from hand_rps_config import ordered_joint_names, target_vector  # noqa: E402
+from build_hand_mjcf import JOINT_LIMITS  # noqa: E402
 
 MODEL_PATH = str(Path(__file__).resolve().parent.parent / "urdf" / "hand_rps.xml")
 OUT_DIR = Path(__file__).resolve().parent.parent / "captures"
@@ -38,8 +39,23 @@ qpos_ids = np.array([
 for gesture in ("rock", "paper", "scissors"):
     # 정적 자세 시각화 목적 — 목표각을 직접 qpos에 대입(kinematic)해 접촉/게인 오차 없이
     # 원 스펙 그대로의 형상을 보여준다. 동역학 추종 자체는 sim_hand_rps.py에서 별도 검증함.
+    # Dex5-1 실측 관절 한계를 넘는 목표값은 실제 하드웨어라면 도달 불가능하므로 클리핑하고 콘솔에 보고한다.
     mujoco.mj_resetData(model, data)
-    data.qpos[qpos_ids] = target_vector(gesture)
+    raw_targets = dict(zip(joint_names, target_vector(gesture)))
+    clipped = []
+    targets = []
+    for (finger, joint) in joint_names:
+        val = raw_targets[(finger, joint)]
+        lo, hi = JOINT_LIMITS[(finger, joint)]
+        c = min(max(val, lo), hi)
+        if c != val:
+            clipped.append((finger, joint, val, c))
+        targets.append(c)
+    if clipped:
+        print(f"[{gesture}] Dex5-1 한계 초과로 클리핑됨:")
+        for finger, joint, orig, c in clipped:
+            print(f"   {finger}.{joint}: {orig:+.3f} -> {c:+.3f} rad")
+    data.qpos[qpos_ids] = targets
     mujoco.mj_forward(model, data)
     renderer.update_scene(data, camera=cam)
     img = renderer.render()
