@@ -148,6 +148,18 @@ def build():
     for finger in ("index", "middle", "ring", "pinky"):
         finger_body_xml(palm, finger, FINGER_ORIGIN[finger])
 
+    # 자체 충돌(self-collision) 배제 — rock/scissors 자세에서 엄지가 검지·중지 위를
+    # 덮을 때 손가락 캡슐끼리 물리적으로 부딪혀 저강성 위치 서보를 밀어내는 문제가
+    # 실측(ncon>0, thumb_ip<->index_pip 등)으로 확인됨. 이 모델은 파지 접촉 물리를
+    # 검증하는 용도가 아니라 목표각 추종/시각화가 목적이므로, 손 내부 body 쌍 전체를
+    # 명시적으로 제외한다.
+    hand_bodies = ["palm", "thumb_cmc", "thumb_cmc_abd", "thumb_mcp", "thumb_ip"]
+    for finger in ("index", "middle", "ring", "pinky"):
+        hand_bodies += [f"{finger}_mcp_abd", f"{finger}_mcp", f"{finger}_pip", f"{finger}_dip"]
+    for i, b1 in enumerate(hand_bodies):
+        for b2 in hand_bodies[i + 1:]:
+            spec.add_exclude(name=f"excl_{b1}_{b2}", bodyname1=b1, bodyname2=b2)
+
     # position actuators, kp 낮게(관절이 작고 가벼움)
     for finger in ("thumb", "index", "middle", "ring", "pinky"):
         joints = ("CMC_opp", "CMC_abd", "MCP_flex", "IP_flex") if finger == "thumb" \

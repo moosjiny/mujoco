@@ -26,6 +26,7 @@ from hand_rps_config import (  # noqa: E402
     ordered_joint_names,
     target_vector,
 )
+from build_hand_mjcf import JOINT_LIMITS  # noqa: E402
 
 MODEL_PATH = str(Path(__file__).resolve().parent.parent / "urdf" / "hand_rps.xml")
 HOLD_SECONDS = 2.0
@@ -44,15 +45,32 @@ def build_index_maps(model):
     return joint_names, act_ids, qpos_ids
 
 
+def clip_to_hardware(joint_names, raw_targets):
+    """Dex5-1 실측 한계로 클리핑, 초과분 목록을 함께 반환."""
+    clipped = []
+    targets = []
+    for (finger, joint), val in zip(joint_names, raw_targets):
+        lo, hi = JOINT_LIMITS[(finger, joint)]
+        c = min(max(val, lo), hi)
+        if c != val:
+            clipped.append((finger, joint, val, c))
+        targets.append(c)
+    return targets, clipped
+
+
 def run_headless(model, data, gestures):
     joint_names, act_ids, qpos_ids = build_index_maps(model)
     steps = int(HOLD_SECONDS / model.opt.timestep)
     for gesture in gestures:
-        data.ctrl[act_ids] = target_vector(gesture)
+        targets, clipped = clip_to_hardware(joint_names, target_vector(gesture))
+        if clipped:
+            print(f"[{gesture}] Dex5-1 한계 초과로 클리핑됨: " +
+                  ", ".join(f"{f}.{j} {o:+.3f}->{c:+.3f}" for f, j, o, c in clipped))
+        data.ctrl[act_ids] = targets
         for _ in range(steps):
             mujoco.mj_step(model, data)
         actual = data.qpos[qpos_ids]
-        err = np.abs(actual - np.array(target_vector(gesture)))
+        err = np.abs(actual - np.array(targets))
         status = "OK" if err.max() < 0.2 else "OUT_OF_TOLERANCE"
         print(f"[{status}] {gesture:10s} max|err|={err.max():.4f} rad mean|err|={err.mean():.4f} rad")
 
@@ -64,12 +82,12 @@ def run_viewer(model, data, gestures):
     idx = 0
     with mujoco.viewer.launch_passive(model, data) as viewer:
         last_switch = time.time()
-        data.ctrl[act_ids] = target_vector(gestures[idx])
+        data.ctrl[act_ids] = clip_to_hardware(joint_names, target_vector(gestures[idx]))[0]
         while viewer.is_running():
             mujoco.mj_step(model, data)
             if time.time() - last_switch > HOLD_SECONDS:
                 idx = (idx + 1) % len(gestures)
-                data.ctrl[act_ids] = target_vector(gestures[idx])
+                data.ctrl[act_ids] = clip_to_hardware(joint_names, target_vector(gestures[idx]))[0]
                 print(f"-> {gestures[idx]}")
                 last_switch = time.time()
             viewer.sync()
